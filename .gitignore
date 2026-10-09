@@ -1,0 +1,11 @@
+# Rust
+/target/
+
+# Node
+node_modules/
+dist/
+
+# Local agent/editor state
+.claude/settings.local.json
+.env
+.env.*

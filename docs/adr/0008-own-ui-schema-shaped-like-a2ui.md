@@ -1,0 +1,3 @@
+# Generative UI uses a hux-owned declarative schema shaped like A2UI
+
+Roles describe UI as a declarative tree of components from a trusted catalog, which each Node renders natively. They do not send HTML or iframe widgets (the MCP Apps / OpenAI Apps SDK approach), because many Nodes have no webview and some have no screen at all. We define our own small schema rather than adopting A2UI directly, because A2UI is still a preview and lacks the two things we need most: Capability profile negotiation, and required spoken and text fallbacks. The schema stays close to A2UI's wire shape so we can adopt A2UI 1.0 later through an adapter. The Gateway, not the Node, converts each tree down to what a Node can present.

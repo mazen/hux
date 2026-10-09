@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ui-prototype",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "apps/ui-prototype", "dev"],
+      "port": 5199
+    }
+  ]
+}

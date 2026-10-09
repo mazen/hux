@@ -1,0 +1,75 @@
+# Hermes Agent (Nous Research): research notes for hux
+
+Researched on 2026-10-09. Primary sources: repo https://github.com/NousResearch/hermes-agent (MIT) and docs https://hermes-agent.nousresearch.com/docs/. The project changes quickly, so version-specific details may already be out of date. **[unverified]** marks claims I could not confirm in a primary source.
+
+## 1. Architecture and deployment
+
+- **One core, many entry points.** The CLI/TUI (`cli.py`), messaging gateway (`gateway/run.py`), ACP editor server (`acp_adapter/`, stdio JSON-RPC for VS Code, Zed and JetBrains), batch runner, API server and Python library all create the same `AIAgent` class. The design rule is "platform-agnostic core": platform differences stay in the entry point. ([architecture](https://hermes-agent.nousresearch.com/docs/developer-guide/architecture))
+- **Gateway.** A single long-running process hosts 20+ platform adapters, including Telegram, Discord, Slack, WhatsApp, Signal, SMS, Email, Matrix, Teams, Home Assistant and ntfy. Each adapter emits a `MessageEvent`. `GatewayRunner` then authorizes the user, resolves a session key, builds an `AIAgent` with that session's history and delivers the reply. The gateway also handles slash-command dispatch, hooks, outbound delivery, cross-session mirroring and the cron tick. ([architecture](https://hermes-agent.nousresearch.com/docs/developer-guide/architecture), [messaging](https://hermes-agent.nousresearch.com/docs/user-guide/messaging/))
+- **Reliability.** A delivery ledger lets final replies be redelivered after a crash. Turns interrupted by a restart auto-resume once. When a message arrives during a busy turn, `busy_input_mode` decides what happens: `interrupt` (the default), `queue` (run it next) or `steer` (inject it at the next tool call). ([messaging](https://hermes-agent.nousresearch.com/docs/user-guide/messaging/))
+- **Where it runs.** It installs on Linux, macOS, WSL2, native Windows, Android/Termux, Docker/compose and Nix. The gateway can be installed as a systemd, launchd or Windows Scheduled Task service. The README pitches it as running on anything from a "$5 VPS" to serverless. ([README](https://github.com/NousResearch/hermes-agent), [messaging](https://hermes-agent.nousresearch.com/docs/user-guide/messaging/))
+- **Desktop app.** The desktop app is an Electron + React UI that does not embed the agent. It talks to a headless `hermes serve` process over JSON-RPC/WebSocket (the `tui_gateway` API). That backend can be app-managed and local, a remote `hermes serve` (for example a VPS or a home server behind Tailscale), SSH, or Hermes Cloud. The app keeps a registry of several gateways and stores their tokens in the OS keyring. The docs recommend OAuth for remote gateways. Config, sessions, skills and memory are shared with the CLI. ([desktop docs](https://hermes-agent.nousresearch.com/docs/user-guide/desktop))
+- **Profiles.** `hermes -p <name>` gives each profile its own home directory, config, memory, sessions and gateway PID, and profiles can run concurrently. ([architecture](https://hermes-agent.nousresearch.com/docs/developer-guide/architecture))
+
+## 2. Memory, skills, scheduling, sub-agents
+
+- **Bounded curated memory.** Two files hold memory: `MEMORY.md` for agent notes (2,200 chars) and `USER.md` for the user profile (1,375 chars). Both are injected as a **frozen snapshot** at session start to protect the prefix cache. Writes made mid-session land on disk but only appear in the prompt from the next session. Nothing is auto-compacted: when a write would exceed the limit, it fails and the agent must consolidate. A background review after each turn, set by nudge intervals, saves memories and skills. `write_approval` can stage those writes for the user to approve. ([memory](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory))
+- **Episodic recall.** All sessions are stored in SQLite (`~/.hermes/state.db`) with FTS5 search. The sources disagree on summarization: the memory page says results are returned without LLM summarization, while the README says "FTS5 search with LLM summarization". **[conflicting]** ([memory](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory), [README](https://github.com/NousResearch/hermes-agent))
+- **User modelling.** Pluggable external memory providers (Honcho for "dialectic user modelling", plus Mem0, Hindsight and others) run alongside the built-in files. Only one provider can be active at a time. ([memory](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory), [architecture](https://hermes-agent.nousresearch.com/docs/developer-guide/architecture))
+- **Self-improving skills.** Skills follow the agentskills.io `SKILL.md` standard and load by progressive disclosure: `skills_list` returns names and descriptions, `skill_view` returns the full text, and `skill_view(name, path)` returns individual reference files. The agent creates and patches its own skills with `skill_manage` after non-trivial tasks. Writes can be staged for review with `/skills pending` and `diff`. Frontmatter can make a skill conditional on which tools are present (for example `fallback_for_toolsets`). A Skills Hub installs skills from several registries. Every install goes through a security scanner with trust tiers (builtin, official, trusted, community), and skills rated "dangerous" are blocked. ([skills](https://hermes-agent.nousresearch.com/docs/user-guide/features/skills))
+- **Cron.** Each cron job is a full agent task rather than a shell command. Jobs are stored in `jobs.json`. A due job runs in a fresh `AIAgent` with no history, can have skills attached, and delivers its result to any platform. The gateway checks for due jobs every 60 s. ([architecture](https://hermes-agent.nousresearch.com/docs/developer-guide/architecture), [messaging](https://hermes-agent.nousresearch.com/docs/user-guide/messaging/))
+- **Sub-agents.** `delegate_task` starts children with fresh context: they receive only the goal and context fields plus project context files, and they get their own terminal. Up to 10 run concurrently, and delegation is flat by default (depth 1). Children cannot use `memory`, `send_message`, `cronjob` or `clarify`. A child returns a structured summary with a status, and the parent can require an `output_schema`. Optional git-worktree isolation keeps parallel edits apart. `/bg` runs a task in the background. ([delegation](https://hermes-agent.nousresearch.com/docs/user-guide/features/delegation))
+
+## 3. Models and providers
+
+- A shared resolver (`runtime_provider.py`) maps `(provider, model)` to `(api_mode, key, base_url)`. It has three wire modes (`chat_completions`, `codex_responses`, `anthropic_messages`) and covers 18+ providers, OAuth, credential pools and fallback. The CLI, gateway, cron and ACP all use it. A separate "auxiliary" model handles side tasks such as vision, summarization and risk scoring for approvals. ([architecture](https://hermes-agent.nousresearch.com/docs/developer-guide/architecture), [providers](https://hermes-agent.nousresearch.com/docs/integrations/providers))
+- **Local models** connect through any OpenAI-compatible endpoint, and the docs include recipes for Ollama, vLLM, SGLang, llama.cpp (`--jinja`) and LM Studio. Hermes **requires at least a 64k context window** and refuses to start with less. ([providers](https://hermes-agent.nousresearch.com/docs/integrations/providers))
+- The system prompt is built in stable, context and volatile tiers with Anthropic cache breakpoints. The prompt is never mutated mid-conversation except by an explicit user action. A pluggable context-compression engine summarizes middle turns. ([architecture](https://hermes-agent.nousresearch.com/docs/developer-guide/architecture))
+- The commercial path is the Nous Portal: one OAuth login covers 300+ models plus a "Tool Gateway" for search, image generation, TTS and a cloud browser. ([README](https://github.com/NousResearch/hermes-agent))
+
+## 4. Tools and extensibility
+
+- `tools/registry.py`: each tool registers itself at import time. Tools are grouped into toolsets, and `check_fn` gating disables a tool when its optional dependencies are missing. The registry holds about 70 tools in about 28 toolsets, plus MCP client support. Plugins come from `~/.hermes/plugins/`, the project `.hermes/plugins/` folder and pip entry points, and can register tools, hooks, CLI commands, memory providers and context engines. ([architecture](https://hermes-agent.nousresearch.com/docs/developer-guide/architecture))
+- `execute_code` lets the model write Python scripts that call tools over RPC, which collapses multi-step tool chains into a single turn. ([README](https://github.com/NousResearch/hermes-agent))
+- There are seven terminal backends: local, Docker, SSH, Singularity, Modal, Daytona and Vercel Sandbox. Modal and Daytona offer serverless persistence that hibernates when idle. ([README](https://github.com/NousResearch/hermes-agent))
+
+## 5. Security and privacy
+
+All points in this section come from the [security docs](https://hermes-agent.nousresearch.com/docs/user-guide/security).
+
+- **Gateway authorization** is default-deny. Users are admitted through allowlists or **DM pairing**: an 8-character code from a cryptographic RNG, valid for 1 hour, rate-limited, with lockout after repeated failures. The owner approves it from the CLI. Admins and regular users can run different sets of slash commands.
+- **Command approval** has three modes: `smart` (an auxiliary LLM rates the risk), `manual` and `off` (YOLO). The user can approve once, for the session or always. Approvals fail closed after a 300 s timeout. Unattended surfaces (cron, API, webhooks) auto-deny dangerous commands. A hard-coded blocklist applies even in YOLO mode, the agent cannot kill its own gateway, and invisible or bidirectional Unicode in commands is detected.
+- **Containers** are hardened: capabilities are dropped, `no-new-privileges` is set and PIDs are limited. Dangerous-command checks are skipped on container backends because the container counts as the boundary.
+- **Secrets** live in `~/.hermes/.env` with mode 0600. Variables whose names look like secrets are stripped from `execute_code` and MCP subprocesses unless explicitly passed through. Error text is redacted before it reaches the model. Write guards protect credential paths, but the docs admit these guards "reduce accidents" rather than containing a hostile agent, because the terminal runs as the same user.
+- **Prompt injection.** Context files (AGENTS.md, SOUL.md, .cursorrules) and memory entries are scanned for heuristic patterns such as "ignore previous instructions", exfiltration attempts via curl and invisible Unicode, and are blocked if they match. The docs say plainly that these are "heuristics, not semantic intent detection".
+- **SSRF and egress.** Web and browser tools block private, loopback and metadata addresses, treat DNS failures as blocked and re-check every redirect. A domain blocklist is available, and an egress proxy guide exists **[not read]**.
+
+## 6. Multi-device and multi-modal
+
+- **Voice.** The CLI/TUI supports push-to-talk, a continuous hands-free mode, barge-in and a "hey hermes" wake word **[wake-word details not read]**. Telegram and Discord can send voice replies, and in Discord voice channels the bot listens continuously. Local STT is faster-whisper; local TTS options are NeuTTS and Piper/KittenTTS (listed only), with Edge TTS (a free cloud service) as the default. Streaming TTS speaks each sentence as it is generated. ([voice mode](https://hermes-agent.nousresearch.com/docs/user-guide/features/voice-mode))
+- **Devices.** "Devices" here means chat apps plus the CLI, desktop app, editors (ACP) and Home Assistant as a tool plugin. The gateway is not aware of device capabilities, and UI is not generated per device: output is chat text or voice. Sessions can be continued across interfaces. ([messaging](https://hermes-agent.nousresearch.com/docs/user-guide/messaging/), [desktop](https://hermes-agent.nousresearch.com/docs/user-guide/desktop))
+
+## 7. Tech stack
+
+The agent core, gateway and tools are written in Python and managed with `uv`. The TUI and desktop app use Node.js, React and Electron. Storage is SQLite + FTS5, with a native `fts5_cjk` extension. Configuration is YAML (`config.yaml`) plus `.env`. The installer also pulls in ripgrep and ffmpeg. The required Python version is **[unverified]**: secondary sources give both 3.11 and 3.14. ([README](https://github.com/NousResearch/hermes-agent), [desktop](https://hermes-agent.nousresearch.com/docs/user-guide/desktop))
+
+## 8. Takeaways for hux
+
+**Copy:**
+1. One agent core with thin entry-point adapters, built on a normalized `MessageEvent` and session-key routing. This maps directly onto hux nodes.
+2. Keep a headless serve process behind a JSON-RPC/WebSocket API, and make the desktop UI just one client that can point at a local or remote gateway with tokens stored in the OS keyring. This is hux's gateway/node split.
+3. Default-deny node admission using pairing codes approved by the owner. This is a good model for enrolling new hux nodes.
+4. Bounded memory files injected as a frozen snapshot, an FTS index over all transcripts for recall, and an optional pluggable semantic/user-model provider. Stage memory and skill writes for user review.
+5. Skills as procedural memory (agentskills.io format), loaded by progressive disclosure and gated on capabilities. The gating maps naturally onto hux's capability-aware nodes.
+6. Treat scheduled jobs as fresh agent runs that deliver to a target. Auto-deny dangerous actions on unattended surfaces, and fail approvals closed on timeout.
+7. Run sub-agents with fresh context, a restricted tool set (no memory or send rights), a structured result and bounded depth and fan-out.
+8. A provider resolver with a few wire modes plus an "auxiliary model" slot, so cheap local models can handle side tasks.
+9. A delivery ledger with redelivery and busy-input modes (interrupt, queue, steer).
+
+**Avoid or improve:**
+1. Prompt-injection defenses that are only regex heuristics, and guards that rely on the agent "behaving" because the terminal runs as the same user. hux should enforce boundaries at the gateway, with capability tokens and per-tool policy, and separate untrusted content structurally.
+2. Skipping approval checks entirely on container backends. Egress and secrets can still leak from inside a container. hux should keep policy on egress, because the gateway owns the internet.
+3. Secrets in a plaintext `.env`. hux should use a gateway-owned vault or keyring and never expose secrets to the model or nodes.
+4. The 64k minimum context and heavy prompts are hostile to small local models. hux should design tight, budgeted prompts.
+5. No device-capability model and no generative UI. Output is text and voice only, so hux has to design this layer itself.
+6. Defaults that leak to the cloud: Edge TTS as the default, and the Portal Tool Gateway. A privacy-first design should default to local options.

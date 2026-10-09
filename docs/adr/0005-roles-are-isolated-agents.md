@@ -1,0 +1,3 @@
+# Roles are isolated agents with hierarchical Delegation
+
+A Role is a separate agent with its own SOUL, memory, permitted tools, permitted data and model choice. It is never a prompt variant inside one big agent. Members talk only to the Chief, and Delegation forms a tree (Chief → Role, or a lead Role → its Team) whose permissions can only narrow at each level; Roles never message each other sideways. We chose this over a single all-powerful agent because it keeps each context small enough for local models, lets each Role use a different model, and splits private data, untrusted content and outbound communication across Roles so that no single agent holds all three without an Approval in between.

@@ -1,0 +1,3 @@
+# Any Model endpoint is allowed; Members set Trust levels instead of hux hard-coding data rules
+
+hux does not restrict where models run (on a Node, on the LAN, self-hosted cloud, or provider APIs such as Anthropic, OpenAI or OpenRouter), and it does not hard-code rules like "finance data stays local". Instead each Model endpoint gets a Member-assigned Trust level, Roles choose their models, and at every model call the Gateway compares the data's Labels with the endpoint's Trust level. When the data is more sensitive than the endpoint is trusted for, it falls back to another model, redacts, or asks. It never sends silently. Privacy is therefore a Member's explicit, inspectable choice rather than a product opinion.
