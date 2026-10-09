@@ -24,6 +24,14 @@ _Avoid_: device info, features
 One place on a Node where output can be perceived: a monitor, a browser tab, a phone screen, a speaker.
 _Avoid_: display, screen, output, page
 
+**Personal Node**:
+A Node that belongs to one Member, such as their phone, and therefore identifies them.
+_Avoid_: own device, private device
+
+**Shared Node**:
+A Node used by the whole Household, such as the kitchen tablet, which does not identify anyone by itself.
+_Avoid_: public device, family device
+
 **Pairing**:
 The act by which a Member admits a new Node to a Gateway and establishes trust in both directions.
 _Avoid_: registration, login, enrolment
@@ -143,6 +151,10 @@ _Avoid_: tag, taint, classification
 **Action tier**:
 How much Member involvement an action needs: done on its own, asked each time, pre-approved narrowly, or left to the Member.
 _Avoid_: permission level, risk level
+
+**Visibility**:
+Who may see an item: only its owner, the whole Household, or named Members.
+_Avoid_: privacy setting, sharing level, access
 
 **Approval**:
 A Member's decision to allow one exact action, given on a paired Node.
