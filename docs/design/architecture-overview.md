@@ -224,6 +224,7 @@ There is no app with pages (ADR 0010). Every screen is a Surface that starts as 
 - **Action tiers** (the dots model): autonomous → ask each time → pre-approvable narrowly (for example "this recurring email to Todd") → user-only (moving money, passwords). Presets per integration; custom rules can tighten but never loosen built-ins.
 - **Approvals** show the final payload and are hash-bound. They are collected on a paired device and fail closed on timeout. Scheduled sends get approved *at scheduling time*, with the exact payload.
 - **Secrets**: plugins and models see handles only. The egress proxy injects credentials and enforces per-plugin host allowlists.
+- **Outside Services are checked like models** (§9): a search, places or weather Service has its own allowlisted hosts, its own key handle and a Member-set Trust level; query text is checked against it by Label before it leaves, and what comes back is labelled as web content.
 - **Audit**: an append-only log of tool calls, approvals and egress, visible in the UI ("Recent activity").
 - Device pairing: a QR code carrying the gateway key plus a one-time token, a per-device key, permissions per node (for example the wall tablet cannot approve payments), and re-pairing on metadata change.
 
@@ -233,6 +234,7 @@ There is no app with pages (ADR 0010). Every screen is a Surface that starts as 
 |---|---|---|
 | Tools (email, lottery, bank, recipes) | Wasm components (WASI 0.3, `hux:*` WIT interfaces) on the gateway | Sandboxed, capability-granted |
 | Third-party tool servers | MCP client (`rmcp`), descriptions pinned by hash, outputs untrusted | External, untrusted |
+| Services behind built-in tools (search, weather, places) | Built-in adapters, Wasm components on the tool's WIT interface, or mapped MCP tools (ADR 0013) | Per-Service Trust level, egress allowlist and secret handle |
 | Skills (know-how only) | `SKILL.md` (agentskills.io format, including Claude Code and Codex extensions) | No authority of their own; bundled scripts only as Wasm |
 | Roles and teams | `SOUL.md` plus role manifest; team bundles; imported Claude Code, Codex and Copilot agent files | Can only narrow the parent's grants |
 | Channels and renderers | Connector nodes over the node protocol | Process-isolated |
@@ -249,6 +251,33 @@ Manifest `hux-plugin.toml`: declared capabilities, deny by default, user consent
 - **Agent files** become Roles (§4, Roles and teams). A2A Agent Cards describe remote agents and are not imported; OpenAI Agents SDK agents are code.
 - **`AGENTS.md`** in a Workspace is read as context for Roles working there, labelled as Workspace content. It grants nothing.
 - Everything imported is hash-pinned, labelled with its source and shown again for approval when it changes.
+
+**MCP servers** (ADR 0009). hux is an MCP client (`rmcp`, spec 2026-07-28) for both transports: remote servers over Streamable HTTP (OAuth where the server asks for it, tokens in the vault, never passed through) and local stdio servers, which run on the Gateway's host only in a sandbox with no network except through the egress proxy.
+- **Adding one is a conversation.** The Member says "connect my Notion" or pastes a link; hux finds the server, then shows one card: what it is, what it can do in plain words ("read and edit your Notion pages"), which Roles get it, and Allow. Sign-in opens the service's own page. Expert mode shows the URL or exact command, transport, every tool's full description and schema, scopes and hashes. An MCP entry in an imported agent file is only a request and goes through the same card (ADR 0012).
+- **Pinned and untrusted.** Tool descriptions are hash-pinned at consent and re-approved when they change; outputs are labelled as third-party content; one server's descriptions never name another's tools.
+- **Granted per Role.** A server's tools reach only the Roles the Member picks, each tool with its own Action tier (read-only tools default to autonomous, everything else to ask each time), and a Delegation passes on no more than the parent holds.
+- **hux as an MCP server** (later, phase 4+). The Gateway can expose a few chosen capabilities ("add to the shopping list", "ask hux", "what's on my calendar today") to other agents such as a coding assistant on the desktop. Each outside agent is paired like a Node, acts as one Member, gets only the tools that Member ticks, and every call goes through the same policy, Labels, Approvals and audit as a Role's. Nothing is exposed until a Member turns it on.
+
+**Built-in tools and their Services** (ADR 0013, `docs/research/tool-providers.md`). Generic abilities (`web_search`, `web_fetch`, `weather`, `places`, `news`) are hux tools with one stable, typed interface; Roles are granted the tool, never a particular Service behind it.
+- **A Service is an extension point.** It is built in (compiled Rust adapter), a Wasm Plugin implementing the tool's WIT interface (`hux:search`, `hux:weather`…), or an MCP server's tool mapped onto the interface by the Member. Each declares the hosts it calls, the secret handle it needs, its terms (attribution, rate limit, cache rules) and what the Service gets to see.
+- **Works out of the box.** hux ships defaults that need no account or key and whose terms allow an app to use them (below). A Member adds or switches Services by asking ("use my Brave key for search"); the key goes into the vault, the host into the egress allowlist for that Service only.
+- **Fallback order.** Each tool has an ordered list of Services. The Gateway tries the next when one fails, is rate-limited or is not trusted for the query, and the answer names the Service that produced it. Results are cached per Service as its terms allow.
+- **Trust level per Service.** A search or geocoding Service sees the query text, so it gets a Member-set Trust level exactly like a Model endpoint (§7, §8), defaulting to *Public*. A query carrying data above that level goes to a more trusted Service, is rewritten without the personal part, or is asked about; it is never sent silently.
+
+**Defaults shipped** (fallback order left to right; terms and caveats in `docs/research/tool-providers.md` §6):
+
+| Tool | Out of the box, no key | Members can add |
+|---|---|---|
+| `web_search` | Wikipedia and DuckDuckGo instant answers, for facts only. No keyless web search is allowed for an app with many installs, so the first open-web question gets one offer: "To search the web I need a search service. Brave's is free for about 1,000 searches a month, though it asks for a card. Set it up?" | Brave, Tavily, Exa, Kagi, Mojeek, Marginalia (free key), the Member's own SearXNG |
+| `web_fetch` | The Gateway fetches the page itself and turns it into text (identifying User-Agent, robots.txt for unattended fetches, no private addresses) | Jina Reader, Firecrawl (hosted or self-hosted) |
+| `weather` | Open-Meteo, then MET Norway | Self-hosted Open-Meteo, Bright Sky (DWD warnings), NWS (US) |
+| `places` | Open-Meteo geocoding for towns and postcodes, then Photon and Nominatim for lookups a Member asks for, cached at the Gateway; OSM map tiles for maps on screen | Geoapify, LocationIQ, OpenCage, self-hosted Photon or Nominatim, another tile server |
+| `news` | RSS feeds from a short starter list the Member can edit, then GDELT | Brave or Tavily news |
+
+- hux does not bundle SearXNG or scrape DuckDuckGo or Google: those engines' terms forbid automated use. A Member's own SearXNG is offered in expert mode, with that said plainly.
+- Every keyless default identifies hux honestly (project contact plus an install id), caches, never polls, and rounds coordinates. Nominatim and MET Norway count all hux installs as one app, so the default list ships as data the project can update without a release.
+- Results carry an attribution the Surface or voice shows ("Weather data by Open-Meteo.com", "© OpenStreetMap contributors", Wikipedia's CC BY-SA).
+- Open-Meteo's free tier and Marginalia's free keys are non-commercial; if hux is ever sold or hosted, these defaults change.
 
 ## 10. Memory
 
