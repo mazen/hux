@@ -103,11 +103,11 @@ _Avoid_: active window, selection, context
 ## Agents and work
 
 **Role**:
-An isolated agent within hux with its own SOUL, memory, permitted tools, permitted data and model choice.
+An isolated agent within hux with its own SOUL, memory, permitted tools, permitted data, model choice and speaking voice.
 _Avoid_: agent, persona, bot, assistant
 
 **SOUL**:
-A Role's identity: who it is, what it values and how it works.
+A Role's identity: its name and pronouns, its personality, what it values and how it works.
 _Avoid_: system prompt, persona, character
 
 **Chief**:
@@ -209,7 +209,7 @@ An installable package that gives hux new tools, sandboxed and limited to the pe
 _Avoid_: extension, add-on, app
 
 **Skill**:
-Installable know-how for Roles: instructions only, with no permissions of its own.
+Installable know-how for Roles: instructions and reference files, with no permissions of its own.
 _Avoid_: prompt, recipe, playbook
 
 **Driver**:

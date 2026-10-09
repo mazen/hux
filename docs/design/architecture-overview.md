@@ -125,6 +125,15 @@ hux may one day be built into an OS, be its own OS, or run in a car. Nothing in 
 - Delegation forms a **tree**, not a free mesh. The user talks to the Chief; the Chief delegates to roles; a lead role (for example a PO) may delegate to its own team (engineers, designer, QA). Roles never message each other sideways, and every hop goes through the gateway, so there is one audit trail.
 - **Grants only narrow down the tree**: a child's tools, data and budget are a subset of its parent's. Results flow up as labelled, structured summaries.
 - Roles and teams are user-definable and shareable (an extension point, §9). Templates such as "Software team" or "Household admin" ship as bundles.
+- **Standard agent files import as Roles** (ADR 0012). A Claude Code subagent (`.claude/agents/*.md`), Codex agent (`.codex/agents/*.toml`) or Copilot agent (`*.agent.md`) maps as follows: name and description become the Role's name and the hint its lead uses to delegate; the instructions become the SOUL; `tools` and MCP servers become *requested* tool grants; `disallowedTools` is honoured (it only narrows); `model` becomes a preference matched against the Member's Model endpoints; `skills` attach Skills. `permissionMode`, `sandbox_mode` and `hooks` are ignored.
+- **What import adds**, because the formats lack it: a model policy checked against Trust levels, data clearance by Label and Visibility, an Action tier per granted tool, a place in the Delegation tree and a budget. Defaults deny: no tools or data until the Member grants them ("This helper wants to read your email. Allow?"), ask each time for anything that leaves the house, no Delegation of its own, placed under the Chief. Grants still narrow down the tree.
+
+### The Chief's personality and voice
+
+- **The Chief is fully the Member's to shape.** Each Member picks their own Chief's name, pronouns (she, he, it, they or anything else), personality (dry or playful, warm or brisk, short or chatty) and voice. A Member can recreate any figure they like for themselves ("Jarvis", "S.A.R.A.H."). hux never assumes a name or gender; the SOUL holds both, and all hux copy refers to the Chief by its chosen name and pronouns.
+- **Changed by asking or in Settings.** "Be more direct" or "you can joke a bit" edits the SOUL through the typed `config` tool: the model interprets the request, code validates the change (ADR 0004). Every edit is versioned with undo (§1a).
+- **Every Role can have its own voice** (timbre, pace, pitch), picked from the TTS backend's voice catalogue and later designed or customised. The Chief's voice is part of its identity, the same on every speaker Surface. Cloning a real person's voice needs that person's consent.
+- What Members create is theirs. hux itself ships only original SOUL templates, never branded or fictional characters.
 
 ## 4a. Context envelope and grounding
 
@@ -211,8 +220,8 @@ There is no app with pages (ADR 0010). Every screen is a Surface that starts as 
 |---|---|---|
 | Tools (email, lottery, bank, recipes) | Wasm components (WASI 0.3, `hux:*` WIT interfaces) on the gateway | Sandboxed, capability-granted |
 | Third-party tool servers | MCP client (`rmcp`), descriptions pinned by hash, outputs untrusted | External, untrusted |
-| Skills (know-how only) | `SKILL.md` (agentskills.io format) | No authority of their own |
-| Roles and teams | `SOUL.md` plus role manifest; team bundles | Can only narrow the parent's grants |
+| Skills (know-how only) | `SKILL.md` (agentskills.io format, including Claude Code and Codex extensions) | No authority of their own; bundled scripts only as Wasm |
+| Roles and teams | `SOUL.md` plus role manifest; team bundles; imported Claude Code, Codex and Copilot agent files | Can only narrow the parent's grants |
 | Channels and renderers | Connector nodes over the node protocol | Process-isolated |
 | Device drivers (Matter, Zigbee, MQTT, HA bridge…) | Connector processes (hardware/LAN) or Wasm (pure network APIs), mapping onto the hux device model | Process-isolated or sandboxed |
 | Model providers, storage, memory backends | Native Rust traits | Compiled in |
@@ -220,6 +229,13 @@ There is no app with pages (ADR 0010). Every screen is a Surface that starts as 
 | Policy, secrets, egress, audit | **Core only** | — |
 
 Manifest `hux-plugin.toml`: declared capabilities, deny by default, user consent at install and on any capability change, signed and hash-pinned, with a registry that has trust tiers.
+
+**Standard formats** (ADR 0012, fields in `docs/research/agent-and-skill-formats.md`). Skills and agents from other ecosystems install as they are; hux translates them and never runs them as written.
+- **Skills**: `name` and `description` are always in context; the body loads when a Role uses the Skill; `references/` and `assets/` load on demand. `disable-model-invocation: true` or `policy.allow_implicit_invocation: false` (`agents/openai.yaml`) means the Skill is used only when asked for by name; `interface.display_name` is its label. `allowed-tools` is read as "this Skill works best with these tools", never as a pre-approval. `hooks`, `` !`command` `` injection and per-skill `model` are ignored.
+- **Bundled scripts** run only as Wasm components in the Plugin sandbox, with no capabilities until the Member grants them. Scripts that cannot run there (shell, native binaries) are shown as text and never executed.
+- **Agent files** become Roles (§4, Roles and teams). A2A Agent Cards describe remote agents and are not imported; OpenAI Agents SDK agents are code.
+- **`AGENTS.md`** in a Workspace is read as context for Roles working there, labelled as Workspace content. It grants nothing.
+- Everything imported is hash-pinned, labelled with its source and shown again for approval when it changes.
 
 ## 10. Memory
 
