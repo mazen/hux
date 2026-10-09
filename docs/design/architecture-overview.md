@@ -95,7 +95,7 @@ hux may one day be built into an OS, be its own OS, or run in a car. Nothing in 
 | Member | A person in the household, with their own identity, profile memory, private items, roles and approvals. Some items and roles are shared, others private. |
 | Surface | One renderable output target on a node (a monitor, browser tab, phone screen, speaker). A node has 0..n. |
 | Widget | A generated UI tree placed on a surface. **Kept** widgets stay until removed; **passing** ones go away. |
-| Layout | A named, saved arrangement of widgets on a surface that can be brought back. |
+| Scene | A named arrangement of a whole surface ("Cooking"), switched by asking, by hand, or by time or place. |
 | Presence | Gateway's belief of where the user is and which surfaces they can perceive, with confidence. |
 | Conversation | The single, cross-device dialogue with the assistant. It can be continued from any node. |
 | Role | An isolated agent: its own **SOUL** (identity, values, working style), its own memory, model policy, tool grants, data clearance and context policy, all enforced by the gateway. |
@@ -163,19 +163,24 @@ Grounding rules:
 
 There is no app with pages (ADR 0010). Every screen is a Surface that starts as empty space plus an input; the Member says what to show and where, and hux places widgets there.
 
-- **Surfaces, not pages.** A browser tab, each desktop monitor, the kitchen tablet and a phone are all Surfaces. Only **Schedule** and **Settings** are predesigned; everything else is generated.
-- **Kept and passing widgets.** A passing widget answers the moment and goes; a kept widget stays until removed. A dashboard is simply kept widgets the Member asked for. An arrangement can be saved as a named **layout** and brought back ("Show my cooking screen").
-- **Placement is asked for in words and done by the model.** "Show the recipe on the right and keep it there" goes to the model, which calls typed placement tools (place, move, resize, keep, remove, send to another Surface, save or restore a layout) against the Surface's current state. The gateway validates the calls; code never parses the request (ADR 0004). Moving or closing a widget by hand is a UI action on the same state.
+- **Surfaces, not pages.** A browser tab, each desktop monitor, the kitchen tablet and a phone are all Surfaces. Only **Schedule** and **Settings** are predesigned: full views with generous space. Everything else is generated.
+- **Three layers on every Surface** (ADR 0011):
+  - **Background**: kept widgets arranged in **regions**. Adding a widget splits a region; regions nest; removing one lets its neighbours close up. A dashboard is simply a Background the Member asked for.
+  - **Windows**: in front, for what the Member is working with now. A passing answer appears here; keeping a window settles it into the Background. Windows can be moved and resized by hand.
+  - **Alerts**: above everything, for what can't wait (an Approval, an alarm, a lottery win), until dealt with.
+- **Scenes.** A Surface's arrangement can be saved as a named **scene** ("Cooking") and switched by asking, by hand, or automatically at a time or in a Place.
+- **Placement is asked for in words and done by the model.** "Show the recipe on the right and keep it there" goes to the model, which calls typed placement tools (place, move, resize, keep, remove, send to another Surface, save or switch a scene) against the Surface's current state. The gateway validates the calls; code never parses the request (ADR 0004). Moving, resizing or closing a window by hand is a UI action on the same state.
 - **Widgets move between Surfaces: push and pull (requirement).** *Push* sends, moves or copies a widget from the Surface you're on to another one ("Move this recipe to my tablet" while at the desk). *Pull* brings a widget from elsewhere to where you are ("Show me the recipe from the desk" while standing in the kitchen). The widget keeps its identity and live state (a running timer keeps running, an edited draft keeps its edits), the target gets the version down-converted for its profile (a speaker reads the recipe aloud), and the origin confirms where it went. "This", "that" and "my tablet" are resolved from Focus and the Member's devices, by the model.
 - **Private widgets follow their owner.** Every widget carries a visibility (only me, the household, or named Members). A private widget can only be pulled or shown by its owner, proven by how sure hux is that it's them: a personal Node bound to that Member (their phone) counts; a recognised voice counts if the Member allows it; a shared Surface with nobody identified (the kitchen tablet) does not. Pushing a private widget onto a shared Surface asks first. When in doubt, hux asks for a confirmation on the owner's personal device instead of showing it.
-- **The gateway owns Surface state.** Per Surface it stores the widgets, their placement and whether they are kept, plus saved layouts, so a Surface comes back as it was after a restart or a reconnect.
-- **Dialogue is secondary.** Replies are short and sit near the input; history is available but never fills the Surface.
+- **The gateway owns Surface state.** Per Surface it stores the widgets, their placement and whether they are kept, plus its scenes, so a Surface comes back as it was after a restart or a reconnect.
+- **Dialogue is secondary.** Replies are short and sit near the input; history never fills the Surface unasked.
+- **Conversation and Threads can be pulled up (requirement).** A Member can open the full Conversation history, and for any Task open its Thread: which Role did what, delegated to whom, with what data and which model. Simple mode tells this in plain words ("Your writing helper drafted the email from your notes"); expert mode shows every step, Label, Model endpoint and timestamp.
 - **Widgets are UI trees** in a hux-owned declarative schema **shaped like A2UI** (ADR 0008): a flat component list, data-model bindings, and `createSurface` / `updateComponents` / `updateDataModel` / `deleteSurface` plus `action` events, kept close enough that adopting A2UI 1.0 later is a straightforward adapter. In A2UI terms each widget is one "surface"; a hux Surface is the screen that holds them.
 - Every widget and every actionable component **must** carry `speak` and `text` fallbacks (the Adaptive Cards lesson).
 - The **gateway down-converts** each widget to a node's profile; nodes never improvise fallbacks. A linearizer produces voice and text output.
 - Components come from a trusted native catalog (cards, lists, checklists, forms, media, maps, charts). A sandboxed `embed` (HTML) component is optional, only on nodes that have a webview.
 - Event stream semantics are borrowed from AG-UI: run lifecycle, text deltas, tool status, state patches, interrupts for approval.
-- **Open: the placement model.** Free placement, tiling, layers or scenes are being prototyped in `apps/ui-prototype`; none is decided.
+- **Theming (requirement).** All visual styling is expressed as semantic design tokens (surface, text, accent, danger, spacing, radius, type scale), never as literal values in components, so Members can pick or install Themes. Light and dark are defined per Theme. The visual direction starts from the free-space prototype (round 2).
 
 ## 7. Model layer (`hux-llm`)
 

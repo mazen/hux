@@ -40,7 +40,7 @@ _Avoid_: registration, login, enrolment
 
 **Widget**:
 One piece of generated UI that hux places on a Surface, such as a recipe, a timer or a week of calendar.
-_Avoid_: card, window, panel, tile
+_Avoid_: card, panel, tile, app
 
 **Kept widget**:
 A Widget a Member asked to keep; it stays on its Surface until someone removes it.
@@ -50,9 +50,29 @@ _Avoid_: pinned, persistent, sticky
 A Widget that answers the moment and goes away on its own or when dismissed.
 _Avoid_: transient, temporary, ephemeral
 
-**Layout**:
-A named arrangement of Widgets on a Surface that a Member saved and can bring back, such as "cooking screen".
-_Avoid_: dashboard, scene, page, view, preset
+**Background**:
+The back of a Surface, where kept widgets sit side by side in Regions.
+_Avoid_: dashboard, desktop, wallpaper, home screen
+
+**Region**:
+An area of the Background that holds one Widget or smaller Regions; it splits when a Widget is added and closes up when one goes.
+_Avoid_: tile, cell, pane, slot, zone
+
+**Window**:
+A Widget in front of the Background that a Member is working with now, which they can move and resize by hand.
+_Avoid_: popup, overlay, panel, card
+
+**Alert**:
+Something urgent shown above everything else on a Surface until a Member deals with it, such as an Approval, an alarm or a lottery win.
+_Avoid_: modal, popup, dialog, banner
+
+**Scene**:
+A named arrangement of a whole Surface, such as "Cooking", that a Member switches to by asking, by hand, or automatically at a time or in a Place.
+_Avoid_: layout, dashboard, page, view, preset, mode
+
+**Theme**:
+The look of hux (colours, type, shapes, light and dark), which a Member picks from those included or installs.
+_Avoid_: skin, style, appearance
 
 ## People and presence
 
