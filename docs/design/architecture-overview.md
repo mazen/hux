@@ -28,13 +28,13 @@ What makes this work:
 - **Settings are typed and schema-described.** Each subsystem and plugin registers a settings schema. The agent changes settings only through a `config` tool against those schemas, never by editing files.
 - **Config changes go through policy** like any other action. They are low-risk ones applied directly and shown as an undoable change, while security-relevant ones (new device, new plugin, egress or permission grants, model changes) need an approval that shows a diff.
 - **Settings are versioned**: history, diff, one-click undo.
-- **The web interface is both chat and control panel.** You converse with the agent, review and edit every setting, roles, memory, schedules, devices, plugins, the activity log and pending approvals. It renders the same generative UI schema as every other node.
+- **The web interface is a Surface like any other** (§6): mostly empty space plus an input, where hux places what the Member asks for, including pending approvals. Only two screens are predesigned: **Schedule** (reminders, calendar, routines) and **Settings** (every setting, roles, memory, devices, plugins, the activity log). Both open by asking or from one small control.
 - The agent explains itself: every automatic change carries a "why" and a link to it in the activity log.
 
 ## 1b. Desktop experience
 
 - The desktop app is a **tray-resident node**, not a big window. A global shortcut opens a quick-input bar (Spotlight-style); push-to-talk or a wake word starts voice.
-- Answers appear as **generated windows**: a weather card, a recipe on the second monitor, a draft email to edit. The gateway places them on a surface, and the user can move or pin them.
+- **Each monitor is its own Surface.** Answers appear as widgets on it: a weather card, a recipe on the second monitor, a draft email to edit. hux places them where the Member asks (§6), and the Member can also move, resize, keep or close them by hand.
 - Voice and visuals work together: you speak, the agent answers by voice **and** shows things ("What's the weather?" gives a spoken summary plus a card).
 - Built with Tauri 2 (tray, global shortcuts, multi-window) and the same web renderer as the gateway's web interface.
 - **First launch is discovery-first.** The desktop app (like any node) looks for gateways on the LAN via mDNS/DNS-SD (`_hux._udp`, advertising the gateway name, key fingerprint and protocol version):
@@ -93,7 +93,9 @@ hux may one day be built into an OS, be its own OS, or run in a car. Nothing in 
 |---|---|
 | Capability profile | What a node can take in and put out: modalities (text/voice/visual), surfaces (count, size class, touch), audio in/out, sensors, location, notification channel. |
 | Member | A person in the household, with their own identity, profile memory, private items, roles and approvals. Some items and roles are shared, others private. |
-| Surface | One renderable output target on a node (a monitor, phone screen, speaker). A node has 0..n. |
+| Surface | One renderable output target on a node (a monitor, browser tab, phone screen, speaker). A node has 0..n. |
+| Widget | A generated UI tree placed on a surface. **Kept** widgets stay until removed; **passing** ones go away. |
+| Layout | A named, saved arrangement of widgets on a surface that can be brought back. |
 | Presence | Gateway's belief of where the user is and which surfaces they can perceive, with confidence. |
 | Conversation | The single, cross-device dialogue with the assistant. It can be continued from any node. |
 | Role | An isolated agent: its own **SOUL** (identity, values, working style), its own memory, model policy, tool grants, data clearance and context policy, all enforced by the gateway. |
@@ -159,11 +161,19 @@ Grounding rules:
 
 ## 6. Generative UI
 
-- A hux-owned declarative schema **shaped like A2UI** (a flat component list, data-model bindings, and `createSurface` / `updateComponents` / `updateDataModel` / `deleteSurface` plus `action` events), kept close enough that adopting A2UI 1.0 later is a straightforward adapter.
-- Every surface and every actionable component **must** carry `speak` and `text` fallbacks (the Adaptive Cards lesson).
-- The **gateway down-converts** each surface to a node's profile; nodes never improvise fallbacks. A linearizer produces voice and text output.
+There is no app with pages (ADR 0010). Every screen is a Surface that starts as empty space plus an input; the Member says what to show and where, and hux places widgets there.
+
+- **Surfaces, not pages.** A browser tab, each desktop monitor, the kitchen tablet and a phone are all Surfaces. Only **Schedule** and **Settings** are predesigned; everything else is generated.
+- **Kept and passing widgets.** A passing widget answers the moment and goes; a kept widget stays until removed. A dashboard is simply kept widgets the Member asked for. An arrangement can be saved as a named **layout** and brought back ("Show my cooking screen").
+- **Placement is asked for in words and done by the model.** "Show the recipe on the right and keep it there" goes to the model, which calls typed placement tools (place, move, resize, keep, remove, send to another Surface, save or restore a layout) against the Surface's current state. The gateway validates the calls; code never parses the request (ADR 0004). Moving or closing a widget by hand is a UI action on the same state.
+- **The gateway owns Surface state.** Per Surface it stores the widgets, their placement and whether they are kept, plus saved layouts, so a Surface comes back as it was after a restart or a reconnect.
+- **Dialogue is secondary.** Replies are short and sit near the input; history is available but never fills the Surface.
+- **Widgets are UI trees** in a hux-owned declarative schema **shaped like A2UI** (ADR 0008): a flat component list, data-model bindings, and `createSurface` / `updateComponents` / `updateDataModel` / `deleteSurface` plus `action` events, kept close enough that adopting A2UI 1.0 later is a straightforward adapter. In A2UI terms each widget is one "surface"; a hux Surface is the screen that holds them.
+- Every widget and every actionable component **must** carry `speak` and `text` fallbacks (the Adaptive Cards lesson).
+- The **gateway down-converts** each widget to a node's profile; nodes never improvise fallbacks. A linearizer produces voice and text output.
 - Components come from a trusted native catalog (cards, lists, checklists, forms, media, maps, charts). A sandboxed `embed` (HTML) component is optional, only on nodes that have a webview.
 - Event stream semantics are borrowed from AG-UI: run lifecycle, text deltas, tool status, state patches, interrupts for approval.
+- **Open: the placement model.** Free placement, tiling, layers or scenes are being prototyped in `apps/ui-prototype`; none is decided.
 
 ## 7. Model layer (`hux-llm`)
 

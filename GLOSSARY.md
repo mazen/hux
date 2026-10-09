@@ -21,12 +21,30 @@ The declaration a Node makes of what it can take in and put out: its modalities,
 _Avoid_: device info, features
 
 **Surface**:
-One place on a Node where output can be perceived: a monitor, a phone screen, a speaker.
-_Avoid_: display, screen, output
+One place on a Node where output can be perceived: a monitor, a browser tab, a phone screen, a speaker.
+_Avoid_: display, screen, output, page
 
 **Pairing**:
 The act by which a Member admits a new Node to a Gateway and establishes trust in both directions.
 _Avoid_: registration, login, enrolment
+
+## Surfaces and widgets
+
+**Widget**:
+One piece of generated UI that hux places on a Surface, such as a recipe, a timer or a week of calendar.
+_Avoid_: card, window, panel, tile
+
+**Kept widget**:
+A Widget a Member asked to keep; it stays on its Surface until someone removes it.
+_Avoid_: pinned, persistent, sticky
+
+**Passing widget**:
+A Widget that answers the moment and goes away on its own or when dismissed.
+_Avoid_: transient, temporary, ephemeral
+
+**Layout**:
+A named arrangement of Widgets on a Surface that a Member saved and can bring back, such as "cooking screen".
+_Avoid_: dashboard, scene, page, view, preset
 
 ## People and presence
 
@@ -85,7 +103,7 @@ A standing instruction to start a Task at a time or when something happens.
 _Avoid_: cron, timer, automation
 
 **Artifact**:
-A durable work product, such as a draft email, a recipe or a shopping list, that can be shown on any Surface and edited.
+A durable work product, such as a draft email, a recipe or a shopping list, that can be shown in a Widget on any Surface and edited.
 _Avoid_: document, output, result
 
 **Workspace**:
