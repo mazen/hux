@@ -9,7 +9,7 @@ Every feature, screen, setting and sentence passes two questions before it ships
 1. **Is this really necessary?** Prefer the smaller version: fewer screens, fewer options, fewer words. A thing earns its place by serving a real use case.
 2. **Would a layperson understand it?** Picture someone who has never configured a server. Label with everyday words and name things by what they do for the person ("Who can turn on the lights"), keeping protocol names, model names and jargon for expert mode.
 
-**Writing copy** (UI text, examples, messages, docs for users): write what a thoughtful human product writer would ship. Use concrete, plausible content drawn from real use cases (a recipe, an email to a colleague, a reminder to buy milk). Every placeholder reads like real data. Keep it short, calm and specific; let the assistant's personality show through brevity, not exclamation marks.
+**Writing copy** (UI text, examples, messages, docs for users): write what a thoughtful human product writer would ship. Use concrete, plausible content drawn from real use cases (a recipe, an email to a colleague, a reminder to buy milk). Every placeholder reads like real data. Keep it short, calm and specific; let the assistant's personality show through brevity, not exclamation marks. Every line of copy carries information the person needs right now: a heading names the thing ("Home", "Reminders"), and the content speaks for itself. Intro sentences and subtitles that describe what a screen shows are cut.
 
 **Simple and expert**: everything works in simple mode. Expert mode reveals detail and control; it never hides something a layperson needs.
 
