@@ -15,6 +15,10 @@ Every feature, screen, setting and sentence passes two questions before it ships
 
 **Models interpret, code validates** (ADR 0004): code never parses user input or repairs model output.
 
+## Code
+
+**Coding standards**: follow `CODING_STANDARDS.md` (rule IDs to cite in reviews; guardrail configs in `docs/design/guardrails.md`).
+
 ## Agent skills
 
 ### Issue tracker

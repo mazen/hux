@@ -8,7 +8,7 @@ Context: [architecture-overview.md](architecture-overview.md).
 On a single Windows machine:
 
 ```
-cargo run -p hux-gateway   →  opens http://localhost:<port>
+cargo run --bin hux-gateway   →  opens http://localhost:<port>
   first run:  "Which model should I use?"  (OpenAI-compatible URL, model picked from /v1/models, optional key)
   then:       chat with the assistant in the browser, streamed, persisted, survives restart
 ```
@@ -32,7 +32,7 @@ hux/
 │   ├── hux-llm/            # model seam; the ONLY crate that imports rig
 │   └── hux-gateway/        # gateway core as a library (sessions, chief, settings, store)
 ├── apps/                   # thin executables and UIs that compose crates
-│   ├── gateway/            # `hux-gateway` binary: config, HTTP server, static web assets
+│   ├── gateway/            # package `hux-gateway-app`, binary `hux-gateway`: config, HTTP server, web assets
 │   └── web/                # React + Tailwind + TypeScript (Vite) → static build
 ├── schemas/                # generated JSON Schema of the protocol (checked in, CI-verified)
 ├── deploy/
@@ -85,7 +85,7 @@ Each slice ends in something runnable and tested.
    - `apps/web` scaffold (Vite, React, TS, Tailwind), pnpm.
    - `hux-gateway` binary serving the built web assets and `/health`.
    - CI on GitHub Actions: Windows + Linux, Rust + web build.
-   - Done when `cargo run -p hux-gateway` serves a placeholder page.
+   - Done when `cargo run --bin hux-gateway` serves a placeholder page.
 2. **Protocol + transport**
    - `Frame`, `hello` handshake (client kind, protocol version, capabilities stub), ping.
    - WebSocket and in-memory adapters.
