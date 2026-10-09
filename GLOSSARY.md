@@ -98,9 +98,13 @@ _Avoid_: handoff, sub-agent call
 A unit of work owned by one Role, with a state and a result.
 _Avoid_: job, ticket, run
 
-**Schedule**:
+**Routine**:
 A standing instruction to start a Task at a time or when something happens.
-_Avoid_: cron, timer, automation
+_Avoid_: schedule, cron, job, automation
+
+**Schedule**:
+The predesigned screen showing a Member's reminders, calendar and Routines.
+_Avoid_: plans, agenda
 
 **Artifact**:
 A durable work product, such as a draft email, a recipe or a shopping list, that can be shown in a Widget on any Surface and edited.
