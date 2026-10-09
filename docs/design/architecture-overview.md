@@ -180,7 +180,7 @@ There is no app with pages (ADR 0010). Every screen is a Surface that starts as 
 - The **gateway down-converts** each widget to a node's profile; nodes never improvise fallbacks. A linearizer produces voice and text output.
 - Components come from a trusted native catalog (cards, lists, checklists, forms, media, maps, charts). A sandboxed `embed` (HTML) component is optional, only on nodes that have a webview.
 - Event stream semantics are borrowed from AG-UI: run lifecycle, text deltas, tool status, state patches, interrupts for approval.
-- **Theming (requirement).** All visual styling is expressed as semantic design tokens (surface, text, accent, danger, spacing, radius, type scale), never as literal values in components, so Members can pick or install Themes. Light and dark are defined per Theme. The visual direction starts from the free-space prototype (round 2).
+- **Theming (requirement).** All visual styling is expressed as semantic design tokens (surface, text, accent, danger, spacing, radius, type scale), never as literal values in components, so Members can pick or install Themes. Every Theme defines both a light and a dark variant. The visual direction starts from the free-space prototype (round 2).
 
 ## 7. Model layer (`hux-llm`)
 

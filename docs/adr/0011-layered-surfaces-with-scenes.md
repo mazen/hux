@@ -9,4 +9,4 @@ The owner chose this after round 2 of the UI prototype, which built four placeme
 - The Gateway stores per Surface its regions, windows, open alerts and scenes; placement tools address a layer.
 - Schedule and Settings stay predesigned (ADR 0010) and get full views with generous space.
 - The full Conversation history and each Task's Thread (who did what, with what data and model) can be pulled up, in plain words by default and in full detail in expert mode.
-- All visual styling is expressed as semantic design tokens, never literal values, so Members can pick or install Themes; light and dark are defined per Theme.
+- All visual styling is expressed as semantic design tokens, never literal values, so Members can pick or install Themes; every Theme defines both a light and a dark variant.
