@@ -1,0 +1,168 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap");
+
+/* Concept 06 "Canvas". Everything is scoped under .v06. */
+
+.v06 {
+  --bg: #ebeae6;
+  --dot: rgba(24, 24, 27, 0.13);
+  --panel: #f8f7f4;
+  --win: #ffffff;
+  --sunk: #f2f1ed;
+  --hover: rgba(24, 24, 27, 0.045);
+  --line: rgba(24, 24, 27, 0.075);
+  --line-2: rgba(24, 24, 27, 0.13);
+  --ink: #17171a;
+  --ink-2: #4e4e56;
+  --ink-3: #8a8a92;
+  --accent: #2f5bea;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(47, 91, 234, 0.09);
+  --amber: #9a5b06;
+  --amber-soft: rgba(224, 149, 30, 0.14);
+  --green: #2c7f55;
+  --green-soft: rgba(44, 127, 85, 0.11);
+  --rain: #5d8ff0;
+  --chrome: rgba(250, 249, 247, 0.78);
+  --sh-1: 0 1px 2px rgba(20, 20, 30, 0.05), 0 8px 22px -12px rgba(20, 20, 30, 0.18);
+  --sh-2: 0 2px 4px rgba(20, 20, 30, 0.06), 0 28px 60px -20px rgba(20, 20, 30, 0.34);
+  --sh-float: 0 1px 2px rgba(20, 20, 30, 0.06), 0 14px 34px -14px rgba(20, 20, 30, 0.26);
+
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  letter-spacing: -0.003em;
+}
+
+.v06.dark {
+  --bg: #0d0e10;
+  --dot: rgba(255, 255, 255, 0.075);
+  --panel: #131417;
+  --win: #18191c;
+  --sunk: #1f2024;
+  --hover: rgba(255, 255, 255, 0.05);
+  --line: rgba(255, 255, 255, 0.065);
+  --line-2: rgba(255, 255, 255, 0.11);
+  --ink: #ececee;
+  --ink-2: #a9a9b1;
+  --ink-3: #6f6f78;
+  --accent: #7d9bff;
+  --accent-ink: #0d0e10;
+  --accent-soft: rgba(125, 155, 255, 0.12);
+  --amber: #f0b45a;
+  --amber-soft: rgba(240, 180, 90, 0.12);
+  --green: #6fcf9b;
+  --green-soft: rgba(111, 207, 155, 0.1);
+  --rain: #7da7ff;
+  --chrome: rgba(24, 25, 28, 0.78);
+  --sh-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 24px -12px rgba(0, 0, 0, 0.6);
+  --sh-2: 0 2px 4px rgba(0, 0, 0, 0.35), 0 30px 70px -20px rgba(0, 0, 0, 0.8);
+  --sh-float: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 40px -14px rgba(0, 0, 0, 0.7);
+  color-scheme: dark;
+}
+
+.v06 .v6-mono {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-feature-settings: "tnum";
+  letter-spacing: 0;
+}
+
+.v06 .v6-canvas {
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--dot) 1px, transparent 1.3px);
+  background-size: 22px 22px;
+  background-position: 11px 11px;
+}
+
+.v06 .v6-win {
+  box-shadow: 0 0 0 1px var(--line-2), var(--sh-1);
+  transition: box-shadow 0.2s ease;
+}
+.v06 .v6-win.is-focus {
+  box-shadow: 0 0 0 1px var(--line-2), var(--sh-2);
+}
+.v06 .v6-win.is-drag {
+  box-shadow: 0 0 0 1px var(--line-2), var(--sh-2);
+  transition: none;
+}
+.v06 .v6-float {
+  background: var(--chrome);
+  box-shadow: 0 0 0 1px var(--line-2), var(--sh-float);
+  backdrop-filter: blur(16px) saturate(1.5);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+}
+.v06 .v6-card {
+  box-shadow: 0 0 0 1px var(--line-2), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Motion */
+@keyframes v6-open {
+  from { opacity: 0; transform: translateY(8px) scale(0.975); }
+  to { opacity: 1; transform: none; }
+}
+.v06 .v6-open { animation: v6-open 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+@keyframes v6-rise {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: none; }
+}
+.v06 .v6-rise { animation: v6-rise 0.28s ease-out both; }
+
+@keyframes v6-drop {
+  from { opacity: 0; transform: translateY(-6px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+.v06 .v6-drop { animation: v6-drop 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+@keyframes v6-fade { from { opacity: 0; } to { opacity: 1; } }
+.v06 .v6-fade { animation: v6-fade 0.18s ease-out both; }
+
+@keyframes v6-blink {
+  0%, 80%, 100% { opacity: 0.2; }
+  40% { opacity: 1; }
+}
+.v06 .v6-typing i {
+  display: inline-block; width: 5px; height: 5px; border-radius: 99px; background: currentColor;
+  animation: v6-blink 1.2s infinite;
+}
+.v06 .v6-typing i:nth-child(2) { animation-delay: 0.15s; }
+.v06 .v6-typing i:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes v6-wave {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+.v06 .v6-wave i {
+  display: block; width: 3px; height: 16px; border-radius: 2px; background: currentColor;
+  animation: v6-wave 0.9s ease-in-out infinite;
+}
+.v06 .v6-wave i:nth-child(2n) { animation-delay: 0.12s; }
+.v06 .v6-wave i:nth-child(3n) { animation-delay: 0.27s; }
+.v06 .v6-wave i:nth-child(5n) { animation-delay: 0.41s; }
+
+@keyframes v6-pulse {
+  0% { box-shadow: 0 0 0 0 var(--amber-soft); }
+  70% { box-shadow: 0 0 0 6px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.v06 .v6-pulse { animation: v6-pulse 2.2s ease-out infinite; }
+
+/* Scrolling */
+.v06 .v6-scroll { scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
+.v06 .v6-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.v06 .v6-scroll::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+.v06 .v6-noscroll { scrollbar-width: none; }
+.v06 .v6-noscroll::-webkit-scrollbar { display: none; }
+.v06 .v6-snap { scroll-snap-type: x mandatory; overscroll-behavior-x: contain; }
+.v06 .v6-snap > * { scroll-snap-align: center; scroll-snap-stop: always; }
+
+.v06 ::selection { background: var(--accent-soft); }
+.v06 input::placeholder, .v06 textarea::placeholder { color: var(--ink-3); }
+.v06 button:focus-visible, .v06 [tabindex]:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v06 *, .v06 *::before, .v06 *::after { animation: none !important; transition: none !important; }
+}

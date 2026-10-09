@@ -1,0 +1,104 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300..900;1,400&display=swap");
+
+/* PROTOTYPE concept 03 "Raster". Everything scoped under .v03. */
+
+.v03 {
+  --paper: #fbfbf9;
+  --paper-2: #f1f1ee;
+  --ink: #0b0b0b;
+  --ink-2: #3a3a3a;
+  --mute: #75756f;
+  --rule: #0b0b0b;
+  --hair: #dcdcd7;
+  --signal: #ff3a14;
+  --signal-ink: #ffffff;
+  --signal-soft: #ffe9e3;
+  font-family: "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-feature-settings: "tnum" 1, "ss01" 1, "cv11" 1;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
+}
+
+.v03.dark {
+  --paper: #0d0d0c;
+  --paper-2: #171716;
+  --ink: #f1f1ec;
+  --ink-2: #c9c9c3;
+  --mute: #8b8b85;
+  --rule: #f1f1ec;
+  --hair: #2a2a28;
+  --signal: #ff5533;
+  --signal-ink: #0d0d0c;
+  --signal-soft: #2a140e;
+}
+
+.v03 *,
+.v03 *::before,
+.v03 *::after { border-color: var(--hair); }
+
+.v03 ::selection { background: var(--signal); color: var(--signal-ink); }
+
+.v03 .c-ink { color: var(--ink); }
+.v03 .c-ink2 { color: var(--ink-2); }
+.v03 .c-mute { color: var(--mute); }
+.v03 .c-sig { color: var(--signal); }
+.v03 .bg-paper { background: var(--paper); }
+.v03 .bg-paper2 { background: var(--paper-2); }
+.v03 .bg-ink { background: var(--ink); color: var(--paper); }
+.v03 .bg-sig { background: var(--signal); color: var(--signal-ink); }
+.v03 .bg-sigsoft { background: var(--signal-soft); }
+.v03 .b-ink { border-color: var(--rule); }
+.v03 .b-sig { border-color: var(--signal); }
+.v03 .b-hair { border-color: var(--hair); }
+
+/* Typographic scale */
+.v03 .t-label {
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.v03 .t-meta { font-size: 12px; line-height: 16px; color: var(--mute); }
+.v03 .t-num { font-variant-numeric: tabular-nums; letter-spacing: -0.04em; font-weight: 700; line-height: 0.85; }
+.v03 .t-display { font-weight: 700; letter-spacing: -0.035em; line-height: 0.95; }
+.v03 .t-head { font-weight: 650; letter-spacing: -0.02em; line-height: 1.1; }
+
+/* Focus */
+.v03 :focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+.v03 button { cursor: pointer; }
+.v03 input::placeholder,
+.v03 textarea::placeholder { color: var(--mute); opacity: 1; }
+
+/* Thin scrollbars */
+.v03 .scroll { scrollbar-width: thin; scrollbar-color: var(--hair) transparent; }
+.v03 .noscroll { scrollbar-width: none; }
+.v03 .noscroll::-webkit-scrollbar { display: none; }
+
+/* Link-like action, underline on hover */
+.v03 .act { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: var(--hair); }
+.v03 .act:hover { text-decoration-color: currentColor; }
+
+/* Motion */
+@keyframes v03-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes v03-stage { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+@keyframes v03-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+@keyframes v03-level { 0%, 100% { transform: scaleY(0.2); } 50% { transform: scaleY(1); } }
+@keyframes v03-wipe { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+.v03 .m-in { animation: v03-in 280ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.v03 .m-stage { animation: v03-stage 320ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.v03 .m-blink { animation: v03-blink 1.2s ease-in-out infinite; }
+.v03 .m-level > i { display: block; width: 2px; height: 14px; background: currentColor; transform-origin: center; animation: v03-level 0.9s ease-in-out infinite; }
+.v03 .m-level > i:nth-child(2) { animation-delay: 0.15s; }
+.v03 .m-level > i:nth-child(3) { animation-delay: 0.3s; }
+.v03 .m-level > i:nth-child(4) { animation-delay: 0.45s; }
+.v03 .m-level > i:nth-child(5) { animation-delay: 0.6s; }
+.v03 .m-wipe { transform-origin: left; animation: v03-wipe 500ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .v03 .m-in, .v03 .m-stage, .v03 .m-wipe { animation: none; }
+  .v03 .m-blink, .v03 .m-level > i { animation: none; }
+}

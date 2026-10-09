@@ -1,0 +1,260 @@
+/* PROTOTYPE - concept 02 "Hearth". Everything scoped under .v02. */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..600,100&family=Figtree:wght@400;500;600&display=swap");
+
+.v02 {
+  --bg: #fbf3e8;
+  --bg-2: #f6e6d2;
+  --sun: rgba(255, 196, 120, 0.55);
+  --surface: rgba(255, 252, 247, 0.72);
+  --surface-solid: #fffaf3;
+  --surface-sunk: rgba(120, 72, 32, 0.055);
+  --line: rgba(92, 58, 30, 0.12);
+  --ink: #34241a;
+  --ink-2: #634a3b;
+  --ink-3: #7a5f4d;
+  --ember: #e2753a;
+  --amber: #f2a94e;
+  --accent-ink: #a8461a;
+  --on-accent: #fffaf3;
+  --scrim: rgba(80, 48, 24, 0.22);
+  --shadow: 0 1px 2px rgba(92, 58, 30, 0.06), 0 12px 32px -12px rgba(120, 70, 30, 0.22);
+  --ok: #4f7d5c;
+  --rain: #6f8fa8;
+
+  /* hearth colours */
+  --h-outer: rgba(255, 186, 110, 0.55);
+  --h-mid: #fbbd72;
+  --h-deep: #ec8a4c;
+  --h-core: #fff8e8;
+
+  font-family: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(120% 70% at 50% -10%, var(--sun), transparent 60%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  -webkit-font-smoothing: antialiased;
+}
+
+.v02.dark {
+  --bg: #120d0a;
+  --bg-2: #0d0907;
+  --sun: rgba(214, 102, 44, 0.16);
+  --surface: rgba(255, 232, 206, 0.045);
+  --surface-solid: #1d1511;
+  --surface-sunk: rgba(255, 226, 196, 0.05);
+  --line: rgba(255, 226, 196, 0.1);
+  --ink: #f3e6d6;
+  --ink-2: #cdb9a5;
+  --ink-3: #a38e7c;
+  --ember: #f0874a;
+  --amber: #f6b860;
+  --accent-ink: #f6a868;
+  --on-accent: #1d120c;
+  --scrim: rgba(6, 3, 2, 0.6);
+  --shadow: 0 1px 0 rgba(255, 226, 196, 0.04) inset, 0 18px 40px -18px rgba(0, 0, 0, 0.7);
+  --ok: #9cc7a4;
+  --rain: #8fb0c9;
+
+  --h-outer: rgba(232, 108, 44, 0.42);
+  --h-mid: #e9823f;
+  --h-deep: #a8361a;
+  --h-core: #ffd9a0;
+  color-scheme: dark;
+}
+
+.v02 .font-display {
+  font-family: "Fraunces", Georgia, serif;
+  font-variation-settings: "SOFT" 100, "opsz" 72;
+  letter-spacing: -0.01em;
+}
+
+.v02 ::selection { background: color-mix(in srgb, var(--ember) 35%, transparent); }
+
+.v02 :focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+.v02 .v02-card:focus-visible, .v02 textarea:focus-visible { border-radius: 20px; }
+
+.v02 .v02-scroll { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.v02 .v02-noscrollbar { scrollbar-width: none; }
+.v02 .v02-noscrollbar::-webkit-scrollbar { display: none; }
+
+.v02 .v02-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+}
+
+/* ------------------------------------------------------------------ */
+/* The hearth: hux's presence                                          */
+/* ------------------------------------------------------------------ */
+
+.v02 .hearth {
+  --size: 168px;
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 999px;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (min-width: 768px) { .v02 .hearth { --size: 184px; } }
+.v02 .hearth.is-small { --size: 112px; }
+@media (min-width: 768px) { .v02 .hearth.is-small { --size: 136px; } }
+
+.v02 .hearth > span { position: absolute; border-radius: 999px; pointer-events: none; }
+
+.v02 .hearth .h-halo {
+  inset: -55%;
+  background: radial-gradient(closest-side, var(--h-outer), transparent 72%);
+  filter: blur(10px);
+  animation: v02-breathe 6.5s ease-in-out infinite;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.v02 .hearth .h-ring {
+  inset: 6%;
+  border: 1.5px solid color-mix(in srgb, var(--amber) 70%, transparent);
+  opacity: 0;
+}
+
+.v02 .hearth .h-body {
+  inset: 10%;
+  background:
+    radial-gradient(60% 55% at 46% 58%, var(--h-core) 0%, transparent 70%),
+    radial-gradient(85% 85% at 50% 60%, var(--h-mid) 0%, var(--h-deep) 78%);
+  box-shadow:
+    0 0 40px 6px color-mix(in srgb, var(--h-mid) 45%, transparent),
+    inset 0 -10px 30px color-mix(in srgb, var(--h-deep) 80%, transparent);
+  animation: v02-morph 14s ease-in-out infinite, v02-breathe 6.5s ease-in-out infinite;
+  transition: filter 0.8s ease;
+}
+
+.v02 .hearth .h-swirl {
+  inset: 16%;
+  background: conic-gradient(from 0deg, transparent 0 20%, color-mix(in srgb, var(--h-core) 70%, transparent) 30%, transparent 45% 70%, color-mix(in srgb, var(--amber) 60%, transparent) 82%, transparent 92%);
+  filter: blur(6px);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.v02 .hearth .h-core {
+  inset: 34% 34% 30% 34%;
+  background: radial-gradient(closest-side, #fff8ea, color-mix(in srgb, var(--h-core) 60%, transparent) 60%, transparent);
+  filter: blur(4px);
+  animation: v02-flicker 3.8s ease-in-out infinite;
+}
+
+.v02 .hearth .h-spark {
+  width: 5px;
+  height: 5px;
+  left: 50%;
+  top: 40%;
+  background: var(--h-core);
+  box-shadow: 0 0 8px 2px var(--amber);
+  opacity: 0;
+}
+
+/* idle: a slow, quiet breath */
+.v02 .hearth[data-state="idle"] .h-body { filter: saturate(0.92) brightness(0.96); }
+
+/* listening: brighter, rings ripple outward toward the hearth */
+.v02 .hearth[data-state="listening"] .h-halo { transform: scale(1.18); opacity: 1; animation-duration: 2.4s; }
+.v02 .hearth[data-state="listening"] .h-body { filter: brightness(1.12) saturate(1.05); animation-duration: 6s, 2.4s; }
+.v02 .hearth[data-state="listening"] .h-ring { animation: v02-ripple 2.4s ease-out infinite; }
+.v02 .hearth[data-state="listening"] .h-ring:nth-of-type(3) { animation-delay: 0.8s; }
+.v02 .hearth[data-state="listening"] .h-ring:nth-of-type(4) { animation-delay: 1.6s; }
+
+/* thinking: the embers swirl inward */
+.v02 .hearth[data-state="thinking"] .h-swirl { opacity: 0.9; animation: v02-spin 2.6s linear infinite; }
+.v02 .hearth[data-state="thinking"] .h-body { animation-duration: 5s, 3.2s; filter: brightness(1.02); }
+.v02 .hearth[data-state="thinking"] .h-halo { opacity: 0.75; }
+
+/* speaking: warm pulse, sparks rise */
+.v02 .hearth[data-state="speaking"] .h-body { animation: v02-morph 7s ease-in-out infinite, v02-speak 1.3s ease-in-out infinite; filter: brightness(1.1); }
+.v02 .hearth[data-state="speaking"] .h-halo { animation: v02-speak 1.3s ease-in-out infinite; }
+.v02 .hearth[data-state="speaking"] .h-core { animation: v02-flicker 0.9s ease-in-out infinite; }
+.v02 .hearth[data-state="speaking"] .h-spark { animation: v02-rise 2.2s ease-out infinite; }
+.v02 .hearth .h-spark:nth-of-type(8) { --dx: -26px; animation-delay: 0s !important; }
+.v02 .hearth .h-spark:nth-of-type(9) { --dx: 18px; animation-delay: 0.45s !important; }
+.v02 .hearth .h-spark:nth-of-type(10) { --dx: -8px; animation-delay: 0.9s !important; }
+.v02 .hearth .h-spark:nth-of-type(11) { --dx: 30px; animation-delay: 1.35s !important; }
+.v02 .hearth .h-spark:nth-of-type(12) { --dx: -34px; animation-delay: 1.8s !important; }
+
+.v02 .hearth:hover .h-body { filter: brightness(1.08); }
+.v02 .hearth:focus-visible { outline-offset: 10px; }
+
+@keyframes v02-breathe {
+  0%, 100% { transform: scale(0.97); }
+  50% { transform: scale(1.04); }
+}
+@keyframes v02-morph {
+  0%, 100% { border-radius: 52% 48% 46% 54% / 55% 50% 50% 45%; }
+  25% { border-radius: 46% 54% 52% 48% / 48% 56% 44% 52%; }
+  50% { border-radius: 55% 45% 50% 50% / 46% 48% 52% 54%; }
+  75% { border-radius: 48% 52% 55% 45% / 54% 45% 55% 46%; }
+}
+@keyframes v02-flicker {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  30% { opacity: 1; transform: scale(1.08) translateY(-2%); }
+  60% { opacity: 0.75; transform: scale(0.95); }
+}
+@keyframes v02-ripple {
+  0% { transform: scale(1.5); opacity: 0; }
+  30% { opacity: 0.55; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+@keyframes v02-spin { to { transform: rotate(360deg); } }
+@keyframes v02-speak {
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(1.05); }
+  40% { transform: scale(0.99); }
+  65% { transform: scale(1.07); }
+  85% { transform: scale(1.01); }
+}
+@keyframes v02-rise {
+  0% { transform: translate(0, 0) scale(1); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate(var(--dx, 0), -120px) scale(0.3); opacity: 0; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion helpers                                                      */
+/* ------------------------------------------------------------------ */
+
+.v02 .v02-rise-in { animation: v02-rise-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes v02-rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.v02 .v02-word { animation: v02-word 0.35s ease both; }
+@keyframes v02-word { from { opacity: 0; filter: blur(3px); } to { opacity: 1; filter: none; } }
+
+.v02 .v02-sheet { transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease; }
+.v02 .v02-scrim { transition: opacity 0.4s ease; }
+
+.v02 .v02-caret::after {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-left: 0.25em;
+  border-radius: 999px;
+  background: var(--ember);
+  animation: v02-flicker 0.9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v02 *, .v02 *::before, .v02 *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

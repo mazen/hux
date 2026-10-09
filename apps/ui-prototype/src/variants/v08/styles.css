@@ -1,0 +1,123 @@
+/* PROTOTYPE - concept 08 "Bold & friendly". Everything scoped under .v08. */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400..800&display=swap");
+
+.v08 {
+  --paper: #fff4e2;
+  --surface: #fffbf4;
+  --sunk: #f6e8d0;
+  --ink: #161310;
+  --line: #161310;
+  --muted: #5d554b;
+  --sun: #ffc83d;
+  --coral: #ff6b4a;
+  --mint: #4fd1a5;
+  --sky: #7cc0ff;
+  --lilac: #b8a2ff;
+  --on-block: #161310;
+  --focus: #2457ff;
+  --bw: 3px;
+  --sh: 5px;
+
+  font-family: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.v08.dark {
+  --paper: #14120f;
+  --surface: #211d18;
+  --sunk: #2b261f;
+  --ink: #f6ecdb;
+  --line: #f6ecdb;
+  --muted: #b9ad9b;
+  --sun: #f2b92a;
+  --coral: #f2603f;
+  --mint: #3cbf93;
+  --sky: #69aef0;
+  --lilac: #a690f5;
+  --on-block: #161310;
+  --focus: #9db4ff;
+}
+
+.v08 .font-display {
+  font-family: "Bricolage Grotesque", "Figtree", ui-sans-serif, system-ui, sans-serif;
+  font-optical-sizing: auto;
+  letter-spacing: -0.02em;
+}
+
+/* Chunky outline and hard offset shadow */
+.v08 .bx { border: var(--bw) solid var(--line); }
+.v08 .sh { box-shadow: var(--sh) var(--sh) 0 0 var(--line); }
+.v08 .sh-sm { box-shadow: 3px 3px 0 0 var(--line); }
+.v08 .sh-lg { box-shadow: 8px 8px 0 0 var(--line); }
+
+/* Pressable: lifts on hover, presses flat on click */
+.v08 .press {
+  transition: transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+  cursor: pointer;
+}
+.v08 .press.sh:hover { transform: translate(-1px, -1px); box-shadow: calc(var(--sh) + 1px) calc(var(--sh) + 1px) 0 0 var(--line); }
+.v08 .press.sh:active { transform: translate(var(--sh), var(--sh)); box-shadow: 0 0 0 0 var(--line); }
+.v08 .press.sh-sm:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 0 var(--line); }
+.v08 .press.sh-sm:active { transform: translate(3px, 3px); box-shadow: 0 0 0 0 var(--line); }
+.v08 .press:disabled { cursor: default; opacity: 0.55; transform: none; }
+
+.v08 :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+/* Colour tokens as utilities */
+.v08 .bg-paper { background: var(--paper); color: var(--ink); }
+.v08 .bg-surface { background: var(--surface); color: var(--ink); }
+.v08 .bg-sunk { background: var(--sunk); color: var(--ink); }
+.v08 .bg-ink { background: var(--ink); color: var(--paper); }
+.v08 .bg-sun { background: var(--sun); color: var(--on-block); }
+.v08 .bg-coral { background: var(--coral); color: var(--on-block); }
+.v08 .bg-mint { background: var(--mint); color: var(--on-block); }
+.v08 .bg-sky { background: var(--sky); color: var(--on-block); }
+.v08 .bg-lilac { background: var(--lilac); color: var(--on-block); }
+.v08 .text-muted { color: var(--muted); }
+.v08 .text-ink { color: var(--ink); }
+.v08 .on-block-muted { color: rgba(22, 19, 16, 0.72); }
+.v08 .border-line { border-color: var(--line); }
+.v08 .divide-line > * + * { border-top: 2px solid var(--line); }
+.v08 .rule { border-top: var(--bw) solid var(--line); }
+.v08 .rule-dash { border-top: 2px dashed var(--line); }
+
+/* Inside colour blocks, thin lines stay dark ink, even in dark mode */
+.v08 .on-block .border-line { border-color: var(--on-block); }
+.v08 .on-block .bg-surface .border-line, .v08 .on-block .bg-sunk .border-line { border-color: var(--line); }
+
+.v08 input::placeholder, .v08 textarea::placeholder { color: var(--muted); opacity: 0.85; }
+
+.v08 .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.v08 .no-scrollbar { scrollbar-width: none; }
+.v08 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Motion */
+@keyframes v08-pop {
+  0% { opacity: 0; transform: translateY(14px) scale(0.98); }
+  70% { opacity: 1; transform: translateY(-2px) scale(1.005); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes v08-bar {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+@keyframes v08-dot {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40% { transform: translateY(-5px); opacity: 1; }
+}
+@keyframes v08-wiggle {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(3deg); }
+}
+.v08 .pop { animation: v08-pop 360ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.v08 .bar { animation: v08-bar 900ms ease-in-out infinite; transform-origin: center; }
+.v08 .dot { animation: v08-dot 1.1s ease-in-out infinite; }
+.v08 .logo-tilt { transform: rotate(-4deg); transition: transform 200ms ease; }
+.v08 .logo-tilt:hover { animation: v08-wiggle 600ms ease-in-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .v08 .pop, .v08 .bar, .v08 .dot, .v08 .logo-tilt:hover { animation: none; }
+  .v08 .press { transition: none; }
+}

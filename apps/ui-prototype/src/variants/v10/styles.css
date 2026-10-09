@@ -1,0 +1,313 @@
+/* PROTOTYPE - concept 10 "Instrument". All rules scoped under .v10. */
+@import url("https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+.v10 {
+  --chassis: #e7e4de;
+  --panel: #f3f1ec;
+  --raised: #fbfaf7;
+  --inset: #dcd8d0;
+  --screen: #f7f5f1;
+  --line: #d2cdc3;
+  --line-strong: #b9b3a7;
+  --ink: #1d1c1a;
+  --ink-2: #47443f;
+  --muted: #78736a;
+  --faint: #a39e93;
+  --signal: #ff5a1f;
+  --signal-ink: #d4460d;
+  --signal-soft: rgba(255, 90, 31, 0.1);
+  --signal-line: rgba(255, 90, 31, 0.45);
+  --key-top: #fdfcfa;
+  --key-bottom: #efece6;
+  --key-edge: #b9b3a7;
+  --well: inset 0 1px 2px rgba(40, 30, 20, 0.12), inset 0 0 0 1px rgba(40, 30, 20, 0.06);
+  --lift: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 1px 2px rgba(40, 30, 20, 0.06), 0 6px 18px -10px rgba(40, 30, 20, 0.25);
+
+  font-family: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+  background: var(--chassis);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01", "cv11";
+}
+
+.v10.dark {
+  --chassis: #171615;
+  --panel: #201f1d;
+  --raised: #2a2826;
+  --inset: #121110;
+  --screen: #1b1a18;
+  --line: #34322e;
+  --line-strong: #4a4742;
+  --ink: #ece9e3;
+  --ink-2: #c4bfb6;
+  --muted: #8f897f;
+  --faint: #5f5a53;
+  --signal: #ff6a2b;
+  --signal-ink: #ff7d45;
+  --signal-soft: rgba(255, 106, 43, 0.12);
+  --signal-line: rgba(255, 106, 43, 0.5);
+  --key-top: #302e2b;
+  --key-bottom: #262422;
+  --key-edge: #0d0c0b;
+  --well: inset 0 1px 3px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --lift: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+}
+
+.v10 .mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "zero" 0;
+}
+
+.v10 .lbl {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Surfaces */
+.v10 .panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--lift);
+}
+.v10 .screen {
+  background: var(--screen);
+  border-radius: 20px;
+  box-shadow: var(--well);
+  border: 1px solid var(--line);
+}
+.v10 .well {
+  background: var(--inset);
+  box-shadow: var(--well);
+}
+.v10 .hairline {
+  border-color: var(--line);
+}
+.v10 .rule {
+  height: 1px;
+  background: var(--line);
+}
+.v10 .ticks {
+  background-image: repeating-linear-gradient(90deg, var(--line-strong) 0 1px, transparent 1px 8px);
+  height: 6px;
+  opacity: 0.6;
+}
+
+/* Keys: physical buttons */
+.v10 .key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(180deg, var(--key-top), var(--key-bottom));
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  box-shadow: 0 1px 0 var(--key-edge), 0 2px 4px -2px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  color: var(--ink);
+  transition: transform 80ms ease, box-shadow 80ms ease, background 120ms ease;
+  cursor: pointer;
+  user-select: none;
+}
+.v10 .key:hover {
+  border-color: var(--line-strong);
+}
+.v10 .key:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 0 var(--key-edge), inset 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.v10 .key:focus-visible,
+.v10 .switch:focus-visible,
+.v10 .focusable:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+.v10 .key-signal {
+  background: linear-gradient(180deg, #ff6d33, var(--signal));
+  border-color: #e04c12;
+  box-shadow: 0 1px 0 #b23a0b, 0 2px 6px -2px rgba(255, 90, 31, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+.v10 .key-signal:hover {
+  border-color: #c9420f;
+}
+.v10 .key-ink {
+  background: linear-gradient(180deg, #34322f, #1d1c1a);
+  border-color: #111;
+  box-shadow: 0 1px 0 #000, inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: #f3f1ec;
+}
+.v10.dark .key-ink {
+  background: linear-gradient(180deg, #f4f2ed, #dedad2);
+  border-color: #bdb7ab;
+  box-shadow: 0 1px 0 #8a857b, inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  color: #1d1c1a;
+}
+.v10 .key-flat {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.v10 .key-flat:hover {
+  background: var(--inset);
+  border-color: transparent;
+}
+
+/* Slide switch */
+.v10 .switch {
+  position: relative;
+  flex: none;
+  width: 42px;
+  height: 24px;
+  border-radius: 7px;
+  background: var(--inset);
+  box-shadow: var(--well);
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+.v10 .switch .knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, var(--key-top), var(--key-bottom));
+  box-shadow: 0 1px 0 var(--key-edge), 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 220ms cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+.v10 .switch .knob::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 6px;
+  right: 6px;
+  border-left: 1px solid var(--line-strong);
+  border-right: 1px solid var(--line-strong);
+}
+.v10 .switch[aria-checked="true"] {
+  background: var(--signal);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+.v10 .switch[aria-checked="true"] .knob {
+  transform: translateX(18px);
+}
+
+/* LEDs */
+.v10 .led {
+  display: inline-block;
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--inset);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.v10 .led-on {
+  background: var(--ink-2);
+  box-shadow: 0 0 0 2px var(--panel), 0 0 0 3px var(--line);
+}
+.v10 .led-signal {
+  background: var(--signal);
+  box-shadow: 0 0 0 2px var(--signal-soft), 0 0 8px var(--signal);
+}
+.v10 .led-pulse {
+  animation: v10-pulse 1.6s ease-in-out infinite;
+}
+
+/* Grille texture */
+.v10 .grille {
+  background-image: radial-gradient(circle, var(--line-strong) 1px, transparent 1.4px);
+  background-size: 6px 6px;
+}
+
+/* Motion */
+.v10 .rise {
+  animation: v10-rise 360ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.v10 .fade {
+  animation: v10-fade 240ms ease both;
+}
+.v10 .slide-in {
+  animation: v10-slide 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.v10 .meter span {
+  display: inline-block;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--signal);
+  animation: v10-meter 900ms ease-in-out infinite;
+}
+.v10 .meter span:nth-child(2) { animation-delay: 120ms; }
+.v10 .meter span:nth-child(3) { animation-delay: 240ms; }
+.v10 .meter span:nth-child(4) { animation-delay: 360ms; }
+.v10 .meter span:nth-child(5) { animation-delay: 480ms; }
+.v10 .dots span {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 99px;
+  background: var(--muted);
+  animation: v10-blink 1.2s ease-in-out infinite;
+}
+.v10 .dots span:nth-child(2) { animation-delay: 200ms; }
+.v10 .dots span:nth-child(3) { animation-delay: 400ms; }
+
+@keyframes v10-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+@keyframes v10-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes v10-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes v10-slide {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes v10-meter {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+@keyframes v10-blink {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+
+/* Scrollbars */
+.v10 .scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+.v10 ::selection {
+  background: var(--signal);
+  color: #fff;
+}
+.v10 input::placeholder,
+.v10 textarea::placeholder {
+  color: var(--faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v10 *,
+  .v10 *::before,
+  .v10 *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+.v10 .no-bar {
+  scrollbar-width: none;
+}
+.v10 .no-bar::-webkit-scrollbar {
+  display: none;
+}

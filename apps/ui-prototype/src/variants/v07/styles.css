@@ -1,0 +1,165 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap");
+
+/* PROTOTYPE concept 07 "Glass". Everything scoped under .v07. */
+
+.v07 {
+  /* Evening, light: lavender sky sinking into peach. */
+  --sky-1: #cfc8ec;
+  --sky-2: #e9cfe0;
+  --sky-3: #f6d9c4;
+  --blob-a: rgba(244, 160, 150, 0.55);
+  --blob-b: rgba(150, 140, 230, 0.5);
+  --blob-c: rgba(250, 200, 140, 0.55);
+
+  --ink: #1b1830;
+  --ink-2: #4a4662;
+  --ink-3: #6b6684;
+  --accent: #5440d0;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(84, 64, 208, 0.12);
+  --ember: #c2502a;
+  --ember-soft: rgba(224, 122, 95, 0.16);
+  --ok: #2f7a55;
+  --ok-soft: rgba(47, 122, 85, 0.13);
+
+  --glass: rgba(255, 255, 255, 0.58);
+  --glass-strong: rgba(255, 255, 255, 0.78);
+  --glass-edge: rgba(255, 255, 255, 0.75);
+  --glass-line: rgba(40, 30, 80, 0.09);
+  --glass-hi: rgba(255, 255, 255, 0.9);
+  --fill: rgba(255, 255, 255, 0.55);
+  --fill-2: rgba(40, 30, 80, 0.05);
+  --shadow: rgba(60, 40, 110, 0.22);
+
+  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--sky-2);
+  -webkit-font-smoothing: antialiased;
+}
+
+.v07.dark {
+  /* Evening, dark: late dusk, ink-blue with an ember horizon. */
+  --sky-1: #0d0f24;
+  --sky-2: #17142e;
+  --sky-3: #2a1730;
+  --blob-a: rgba(170, 70, 100, 0.38);
+  --blob-b: rgba(80, 70, 190, 0.42);
+  --blob-c: rgba(200, 110, 60, 0.28);
+
+  --ink: #f3f1fb;
+  --ink-2: #c4c0da;
+  --ink-3: #9893b4;
+  --accent: #a99cff;
+  --accent-ink: #15122c;
+  --accent-soft: rgba(169, 156, 255, 0.16);
+  --ember: #ffa483;
+  --ember-soft: rgba(255, 164, 131, 0.14);
+  --ok: #7fd3a6;
+  --ok-soft: rgba(127, 211, 166, 0.13);
+
+  --glass: rgba(26, 24, 52, 0.56);
+  --glass-strong: rgba(30, 28, 60, 0.82);
+  --glass-edge: rgba(255, 255, 255, 0.12);
+  --glass-line: rgba(255, 255, 255, 0.08);
+  --glass-hi: rgba(255, 255, 255, 0.16);
+  --fill: rgba(255, 255, 255, 0.06);
+  --fill-2: rgba(255, 255, 255, 0.05);
+  --shadow: rgba(0, 0, 0, 0.5);
+}
+
+.v07 .serif { font-family: "Instrument Serif", ui-serif, Georgia, serif; font-weight: 400; letter-spacing: 0; }
+.v07 .ink { color: var(--ink); }
+.v07 .ink-2 { color: var(--ink-2); }
+.v07 .ink-3 { color: var(--ink-3); }
+.v07 .accent { color: var(--accent); }
+.v07 .ember { color: var(--ember); }
+.v07 .ok { color: var(--ok); }
+.v07 .line { border-color: var(--glass-line); }
+.v07 .fill { background: var(--fill); }
+.v07 .fill-2 { background: var(--fill-2); }
+.v07 .accent-soft { background: var(--accent-soft); }
+.v07 .ember-soft { background: var(--ember-soft); }
+.v07 .ok-soft { background: var(--ok-soft); }
+.v07 .btn-accent { background: var(--accent); color: var(--accent-ink); }
+.v07 .btn-accent:hover { filter: brightness(1.08); }
+.v07 .tabular { font-variant-numeric: tabular-nums; }
+
+/* ---------- Backdrop ---------- */
+.v07 .backdrop {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  background: linear-gradient(165deg, var(--sky-1) 0%, var(--sky-2) 52%, var(--sky-3) 100%);
+  transition: background 600ms ease;
+}
+.v07 .blob {
+  position: absolute; border-radius: 9999px; will-change: transform;
+}
+.v07 .blob-a { width: 70vmax; height: 70vmax; left: -20vmax; top: -25vmax; background: radial-gradient(circle at center, var(--blob-b), transparent 62%); animation: v07-drift-a 46s ease-in-out infinite alternate; }
+.v07 .blob-b { width: 60vmax; height: 60vmax; right: -18vmax; top: 10vmax; background: radial-gradient(circle at center, var(--blob-a), transparent 62%); animation: v07-drift-b 58s ease-in-out infinite alternate; }
+.v07 .blob-c { width: 80vmax; height: 50vmax; left: 10vmax; bottom: -28vmax; background: radial-gradient(ellipse at center, var(--blob-c), transparent 64%); animation: v07-drift-c 70s ease-in-out infinite alternate; }
+.v07 .grain {
+  position: absolute; inset: 0; opacity: 0.08; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+@keyframes v07-drift-a { to { transform: translate(14vmax, 8vmax) scale(1.08); } }
+@keyframes v07-drift-b { to { transform: translate(-10vmax, 12vmax) scale(0.94); } }
+@keyframes v07-drift-c { to { transform: translate(-12vmax, -6vmax) scale(1.1); } }
+
+/* ---------- Glass ---------- */
+.v07 .glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
+  border: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-hi), 0 18px 40px -22px var(--shadow), 0 2px 6px -3px var(--shadow);
+}
+.v07 .glass-strong {
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid var(--glass-edge);
+  box-shadow: inset 0 1px 0 var(--glass-hi), 0 22px 50px -24px var(--shadow), 0 2px 8px -4px var(--shadow);
+}
+/* Nested surfaces never blur again: a tinted fill keeps the stack calm. */
+.v07 .pane { background: var(--fill); border: 1px solid var(--glass-line); }
+
+/* ---------- Motion: replies surface from depth ---------- */
+.v07 .surface {
+  animation: v07-surface 720ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes v07-surface {
+  from { opacity: 0; transform: translateY(14px) scale(0.975); filter: blur(10px); }
+  60% { filter: blur(0); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.v07 .rise { animation: v07-rise 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes v07-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.v07 .depth-dots span {
+  display: inline-block; width: 7px; height: 7px; border-radius: 9999px; background: var(--accent);
+  animation: v07-dot 1.2s ease-in-out infinite;
+}
+.v07 .depth-dots span:nth-child(2) { animation-delay: 0.15s; }
+.v07 .depth-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes v07-dot { 0%, 100% { opacity: 0.25; transform: translateY(2px) scale(0.8); } 50% { opacity: 1; transform: none; } }
+
+.v07 .listen-ring { animation: v07-ring 1.6s ease-out infinite; }
+.v07 .listen-ring.delay { animation-delay: 0.8s; }
+@keyframes v07-ring { from { transform: scale(1); opacity: 0.55; } to { transform: scale(2.1); opacity: 0; } }
+
+.v07 .wave span { display: inline-block; width: 3px; border-radius: 3px; background: var(--accent); animation: v07-wave 1s ease-in-out infinite; }
+@keyframes v07-wave { 0%, 100% { height: 6px; } 50% { height: 22px; } }
+
+.v07 .tab-indicator { transition: transform 420ms cubic-bezier(0.3, 0.9, 0.25, 1), width 420ms cubic-bezier(0.3, 0.9, 0.25, 1); }
+
+.v07 .scroll-soft { scrollbar-width: thin; scrollbar-color: var(--glass-line) transparent; }
+.v07 .no-scrollbar { scrollbar-width: none; }
+.v07 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+.v07 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.v07 input::placeholder, .v07 textarea::placeholder { color: var(--ink-3); }
+
+@media (prefers-reduced-motion: reduce) {
+  .v07 .blob, .v07 .surface, .v07 .rise, .v07 .listen-ring, .v07 .wave span, .v07 .depth-dots span { animation: none !important; }
+}
+
+.v07 .fade-top { -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 22px); mask-image: linear-gradient(to bottom, transparent 0, #000 22px); }

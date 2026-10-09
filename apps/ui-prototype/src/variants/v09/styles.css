@@ -1,0 +1,138 @@
+/* PROTOTYPE - concept 09 "Grove". Everything scoped under .v09. */
+@import url("https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap");
+
+.v09 {
+  --bg: #f2eee6;
+  --surface: #f8f5ef;
+  --raised: #fffdf9;
+  --sunk: #eae4d9;
+  --line: #e2dacc;
+  --line-strong: #cfc5b4;
+  --ink: #232b25;
+  --ink-2: #56605a;
+  --ink-3: #8a8f86;
+  --moss: #3e6a4d;
+  --moss-hover: #335a41;
+  --moss-ink: #f6f3ec;
+  --moss-soft: #dde7d8;
+  --moss-text: #2f5a3e;
+  --clay: #b4643e;
+  --clay-soft: #f2e1d4;
+  --ochre: #b98a2e;
+  --ochre-soft: #f3e7c8;
+  --rain: #5e87a0;
+  --rain-soft: #dce7ee;
+  --shadow: 0 1px 2px rgb(60 50 30 / 0.05), 0 8px 24px -12px rgb(60 50 30 / 0.18);
+  --shadow-lift: 0 2px 6px rgb(40 35 20 / 0.08), 0 30px 80px -20px rgb(40 35 20 / 0.35);
+  --scrim: rgb(35 40 33 / 0.28);
+
+  font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(900px 520px at 8% -8%, color-mix(in oklab, var(--moss) 9%, transparent), transparent 70%),
+    radial-gradient(700px 480px at 100% 110%, color-mix(in oklab, var(--clay) 7%, transparent), transparent 70%),
+    var(--bg);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "kern", "liga", "tnum" 0;
+}
+
+.v09.dark {
+  --bg: #141814;
+  --surface: #191e1a;
+  --raised: #202620;
+  --sunk: #272e28;
+  --line: #2e362f;
+  --line-strong: #3e473e;
+  --ink: #e9e6dc;
+  --ink-2: #b4b6aa;
+  --ink-3: #80857a;
+  --moss: #86b590;
+  --moss-hover: #9ac5a3;
+  --moss-ink: #122017;
+  --moss-soft: #24352a;
+  --moss-text: #a6cdae;
+  --clay: #de9068;
+  --clay-soft: #3a2820;
+  --ochre: #d9b25e;
+  --ochre-soft: #3a3120;
+  --rain: #8fb4c9;
+  --rain-soft: #1f2d35;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 30px -14px rgb(0 0 0 / 0.6);
+  --shadow-lift: 0 2px 8px rgb(0 0 0 / 0.35), 0 30px 90px -20px rgb(0 0 0 / 0.75);
+  --scrim: rgb(5 8 5 / 0.55);
+}
+
+.v09 .g-display {
+  font-family: "Alegreya Sans", "Source Sans 3", ui-sans-serif, sans-serif;
+  letter-spacing: -0.005em;
+}
+.v09 .g-num { font-variant-numeric: tabular-nums; }
+.v09 .g-mono { font-family: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, monospace; font-size: 0.78em; }
+
+.v09 ::selection { background: color-mix(in oklab, var(--moss) 30%, transparent); }
+
+.v09 :focus-visible {
+  outline: 2px solid var(--moss);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+.v09 .g-scroll { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+.v09 .g-noscroll { scrollbar-width: none; }
+.v09 .g-noscroll::-webkit-scrollbar { display: none; }
+
+/* Soft entrance */
+@keyframes g-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.v09 .g-rise { animation: g-rise 380ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+@keyframes g-fade { from { opacity: 0; } to { opacity: 1; } }
+.v09 .g-fade { animation: g-fade 220ms ease-out both; }
+
+/* The ask bar lifting to the centre */
+@keyframes g-lift {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+.v09 .g-lift { animation: g-lift 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+@keyframes g-sheet-r { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes g-sheet-b { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.v09 .g-sheet { animation: g-sheet-b 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@media (min-width: 768px) {
+  .v09 .g-sheet { animation-name: g-sheet-r; }
+}
+
+/* Growth rings: listening */
+@keyframes g-ring {
+  0% { transform: scale(0.6); opacity: 0.55; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+.v09 .g-ring { animation: g-ring 1.8s cubic-bezier(0.2, 0.6, 0.3, 1) infinite; }
+.v09 .g-ring-2 { animation-delay: 0.6s; }
+.v09 .g-ring-3 { animation-delay: 1.2s; }
+
+/* Thinking dots */
+@keyframes g-dot { 0%, 80%, 100% { opacity: 0.25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-2px); } }
+.v09 .g-dot { animation: g-dot 1.2s ease-in-out infinite; }
+.v09 .g-dot:nth-child(2) { animation-delay: 0.15s; }
+.v09 .g-dot:nth-child(3) { animation-delay: 0.3s; }
+
+/* Highlight when jumping to something */
+@keyframes g-flash {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--moss) 0%, transparent); background-color: color-mix(in oklab, var(--moss-soft) 0%, transparent); }
+  20% { box-shadow: 0 0 0 4px color-mix(in oklab, var(--moss) 28%, transparent); background-color: var(--moss-soft); }
+  100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--moss) 0%, transparent); }
+}
+.v09 .g-flash { animation: g-flash 2.2s ease-out both; }
+
+/* Hand-drawn feel for the ring mark */
+.v09 .g-mark ellipse, .v09 .g-mark circle { vector-effect: non-scaling-stroke; }
+
+.v09 .g-toggle-knob { transition: transform 220ms cubic-bezier(0.3, 0.7, 0.3, 1.2), background-color 200ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .v09 *, .v09 *::before, .v09 *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+}
