@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* Variants toggle dark mode by putting `dark` on their own root element. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+html, body, #root { height: 100%; margin: 0; }

@@ -1,0 +1,63 @@
+/* PROTOTYPE - concept 04 "Scenes". Everything scoped under .v04. */
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+
+.v04 {
+  --bg: #f3f1ec;
+  --card: #ffffff;
+  --card2: #f7f5f1;
+  --soft: #efece6;
+  --line: #e2ded5;
+  --ink: #1d1c1a;
+  --mute: #69645c;
+  --faint: #a29c92;
+  --accent: #3e6b58;
+  font-family: "Instrument Sans", system-ui, sans-serif;
+  color: var(--ink);
+  background: color-mix(in oklab, var(--hue) 7%, var(--bg));
+  transition: background-color 0.6s ease;
+}
+.v04.dark {
+  --bg: #141412;
+  --card: #1e1d1a;
+  --card2: #252421;
+  --soft: #2b2a26;
+  --line: #34322d;
+  --ink: #ece9e3;
+  --mute: #a39e94;
+  --faint: #6f6b63;
+  --accent: #6fa58c;
+  background: color-mix(in oklab, var(--hue) 6%, var(--bg));
+}
+.v04 .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+.v04 .no-scrollbar { scrollbar-width: none; }
+.v04 .no-scrollbar::-webkit-scrollbar { display: none; }
+.v04 textarea { color: var(--ink); }
+
+/* Surface grid: stacked on phones (middle first), named areas from 768px. */
+.v04 .sg { display: flex; flex-direction: column; gap: 12px; }
+.v04 .sg > [data-area="main"] { order: 1; }
+.v04 .sg > [data-area="right"] { order: 2; }
+.v04 .sg > [data-area="left"] { order: 3; }
+.v04 .sg > [data-area="bottom"] { order: 4; }
+@media (min-width: 768px) {
+  .v04 .sg {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: var(--cols);
+    grid-template-rows: var(--rows);
+    grid-template-areas: var(--areas);
+    transition: grid-template-columns 0.35s ease;
+  }
+  .v04 .sg > [data-area="bottom"] { max-height: 40vh; }
+}
+
+.v04 .scene-in { animation: v04-scene 0.4s ease both; }
+.v04 .w-in { animation: v04-pop 0.3s ease both; }
+.v04 .trace-in { animation: v04-pop 0.25s ease both; }
+.v04 .listening { animation: v04-pulse 1s ease-in-out infinite; }
+@keyframes v04-scene { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes v04-pop { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: none; } }
+@keyframes v04-pulse { 50% { box-shadow: 0 0 0 6px color-mix(in oklab, var(--hue) 25%, transparent); } }
+@media (prefers-reduced-motion: reduce) {
+  .v04 .scene-in, .v04 .w-in, .v04 .trace-in, .v04 .listening { animation: none; }
+}

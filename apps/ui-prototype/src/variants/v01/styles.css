@@ -1,0 +1,182 @@
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+/* PROTOTYPE - concept 01 "Free space". Everything scoped under .v01. */
+.v01 {
+  --bg: #f3f1ec;
+  --dot: rgba(70, 60, 40, 0.09);
+  --dot-strong: rgba(70, 60, 40, 0.26);
+  --card: #ffffff;
+  --card2: #f6f4f0;
+  --line: rgba(40, 30, 20, 0.1);
+  --text: #1f1d1a;
+  --muted: #6c675f;
+  --faint: #a29d94;
+  --accent: #2c7a71;
+  --accent-soft: rgba(44, 122, 113, 0.11);
+  --warn: #a95f1c;
+  --warn-soft: rgba(169, 95, 28, 0.1);
+  --shadow: 0 1px 2px rgba(30, 20, 10, 0.05), 0 10px 28px rgba(30, 20, 10, 0.07);
+  --shadow-lift: 0 2px 4px rgba(30, 20, 10, 0.06), 0 22px 48px rgba(30, 20, 10, 0.16);
+  font-family: "Figtree", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+}
+.v01.dark {
+  --bg: #111214;
+  --dot: rgba(255, 255, 255, 0.06);
+  --dot-strong: rgba(255, 255, 255, 0.2);
+  --card: #1a1b1e;
+  --card2: #222327;
+  --line: rgba(255, 255, 255, 0.08);
+  --text: #ebe9e5;
+  --muted: #a19d96;
+  --faint: #6c6862;
+  --accent: #62b3a8;
+  --accent-soft: rgba(98, 179, 168, 0.14);
+  --warn: #e0a262;
+  --warn-soft: rgba(224, 162, 98, 0.12);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 28px rgba(0, 0, 0, 0.3);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.4), 0 22px 48px rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+}
+.v01 .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 10.5px; letter-spacing: -0.01em; }
+.v01 button { cursor: pointer; }
+
+/* The Surface: open space with a loose 24px grid that only becomes visible while you move things. */
+.v01 .surface {
+  background-image: radial-gradient(var(--dot) 1px, transparent 1.3px);
+  background-size: 24px 24px;
+  background-position: 0 0;
+  transition: background-color 0.3s;
+}
+.v01 .surface.is-dragging { background-image: radial-gradient(var(--dot-strong) 1.1px, transparent 1.4px); }
+
+.v01 .guide {
+  position: absolute; border-radius: 18px; pointer-events: none;
+  transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+  border: 1px dashed transparent;
+}
+.v01 .guide span {
+  position: absolute; left: 14px; top: 10px; font-size: 11px; color: var(--faint);
+  letter-spacing: 0.02em;
+}
+.v01 .guide.on { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
+.v01 .guide.on span { color: var(--accent); }
+
+.v01 .hint {
+  position: absolute; border-radius: 20px; pointer-events: none;
+  background: var(--accent-soft);
+  border: 1px dashed color-mix(in srgb, var(--accent) 40%, transparent);
+  animation: v01-hint 1.6s ease forwards;
+}
+.v01 .hint span {
+  position: absolute; left: 12px; top: 10px; font-size: 11px; font-weight: 600; color: var(--accent);
+  background: var(--card); padding: 3px 8px; border-radius: 999px; box-shadow: var(--shadow);
+}
+@keyframes v01-hint { 0% { opacity: 0; } 15% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Widgets: one family. */
+.v01 .w {
+  position: absolute; left: 0; top: 0;
+  transition:
+    transform 0.6s cubic-bezier(0.22, 0.9, 0.24, 1),
+    width 0.6s cubic-bezier(0.22, 0.9, 0.24, 1),
+    height 0.6s cubic-bezier(0.22, 0.9, 0.24, 1),
+    opacity 1.2s ease;
+}
+.v01 .w.lifted { transition: width 0.15s, height 0.15s, opacity 0.3s; }
+.v01 .w.resizing { transition: none; }
+.v01 .w.flying { transition: transform 0.55s cubic-bezier(0.5, 0, 0.75, 0), opacity 0.55s ease, width 0.55s, height 0.55s; }
+.v01 .w-in {
+  height: 100%; display: flex; flex-direction: column;
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+  box-shadow: var(--shadow); overflow: hidden;
+  animation: v01-in 0.5s cubic-bezier(0.22, 0.9, 0.24, 1);
+  transition: box-shadow 0.25s, scale 0.25s, opacity 0.35s;
+}
+.v01 .w.lifted .w-in { box-shadow: var(--shadow-lift); scale: 1.015; }
+.v01 .w.leaving .w-in { opacity: 0; scale: 0.96; }
+.v01 .w.flash .w-in { box-shadow: 0 0 0 2px var(--accent), var(--shadow); }
+.v01 .w.passing .w-in { background: color-mix(in srgb, var(--card) 88%, var(--bg)); }
+@keyframes v01-in { from { opacity: 0; scale: 0.94; } to { opacity: 1; scale: 1; } }
+
+.v01 .w header {
+  display: flex; align-items: center; gap: 7px; height: 34px; flex: none;
+  padding: 0 6px 0 12px; color: var(--muted); font-size: 12px; font-weight: 600;
+  cursor: grab; user-select: none; touch-action: none;
+}
+.v01 .w.lifted header { cursor: grabbing; }
+.v01 .w.stacked header { cursor: default; }
+.v01 .w header .title { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.v01 .ctl { display: flex; gap: 1px; opacity: 0; transition: opacity 0.2s; }
+.v01 .w:hover .ctl, .v01 .w:focus-within .ctl, .v01 .w.stacked .ctl { opacity: 1; }
+.v01 .ib {
+  display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px;
+  color: var(--faint); background: transparent; border: 0;
+}
+.v01 .ib:hover { background: var(--card2); color: var(--text); }
+.v01 .pin.on { color: var(--accent); opacity: 1; }
+.v01 .pinmark { color: var(--accent); }
+.v01 .w .body { flex: 1; min-height: 0; overflow: auto; padding: 2px 14px 14px; }
+.v01 .w footer {
+  flex: none; padding: 5px 12px; border-top: 1px dashed var(--line); color: var(--faint);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.v01 .rs {
+  position: absolute; right: 2px; bottom: 2px; width: 16px; height: 16px; cursor: nwse-resize;
+  touch-action: none; opacity: 0; transition: opacity 0.2s;
+  background: linear-gradient(135deg, transparent 55%, var(--faint) 55%, var(--faint) 62%, transparent 62%, transparent 72%, var(--faint) 72%, var(--faint) 79%, transparent 79%);
+  border-bottom-right-radius: 14px;
+}
+.v01 .w:hover .rs { opacity: 0.8; }
+
+.v01 .chip {
+  flex: none; height: 30px; padding: 0 12px; border-radius: 999px; font-size: 12.5px;
+  border: 1px solid var(--line); background: var(--card); color: var(--text); white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.v01 .chip:hover { border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
+.v01 .chip.used { opacity: 0.5; }
+.v01 .chip.next { border-color: color-mix(in srgb, var(--accent) 55%, transparent); background: var(--accent-soft); color: var(--accent); }
+.v01 .noscroll { scrollbar-width: none; }
+.v01 .noscroll::-webkit-scrollbar { display: none; }
+
+.v01 .btn {
+  height: 30px; padding: 0 12px; border-radius: 9px; font-size: 12.5px; font-weight: 600;
+  border: 1px solid var(--line); background: var(--card2); color: var(--text);
+}
+.v01 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--card); }
+.v01 .label { font-size: 11px; color: var(--faint); font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
+
+.v01 .tile {
+  display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 9px; border-radius: 9px;
+  border: 1px solid transparent; color: var(--muted); font-size: 12px; background: transparent;
+  transition: background 0.2s, border-color 0.2s;
+}
+.v01 .tile:hover { background: var(--card); border-color: var(--line); }
+.v01 .tile .dot { min-width: 16px; height: 16px; border-radius: 999px; font-size: 10px; font-weight: 700; display: grid; place-items: center; padding: 0 4px; background: var(--accent-soft); color: var(--accent); }
+.v01 .tile.pulse { animation: v01-pulse 0.9s ease 2; }
+@keyframes v01-pulse { 50% { background: var(--accent-soft); border-color: var(--accent); } }
+
+.v01 .drop {
+  border: 1.5px dashed var(--line); border-radius: 16px; background: color-mix(in srgb, var(--card) 80%, transparent);
+  backdrop-filter: blur(6px); transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+.v01 .drop.over { border-color: var(--accent); background: var(--accent-soft); transform: scale(1.04); }
+.v01 .drop.no { opacity: 0.45; }
+
+.v01 .pop { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-lift); }
+.v01 .sheet { background: var(--card); border-left: 1px solid var(--line); box-shadow: var(--shadow-lift); animation: v01-sheet 0.35s cubic-bezier(0.22, 0.9, 0.24, 1); }
+@keyframes v01-sheet { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.v01 .toggle { width: 34px; height: 20px; border-radius: 999px; background: var(--line); position: relative; border: 0; transition: background 0.2s; flex: none; }
+.v01 .toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 999px; background: var(--card); box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform 0.2s; }
+.v01 .toggle.on { background: var(--accent); }
+.v01 .toggle.on::after { transform: translateX(14px); }
+.v01 .listening { animation: v01-listen 1s ease-in-out infinite; }
+@keyframes v01-listen { 50% { box-shadow: 0 0 0 6px var(--accent-soft); } }
+.v01 .think { animation: v01-think 1s ease-in-out infinite; }
+@keyframes v01-think { 50% { opacity: 0.3; } }
+.v01 textarea { font: inherit; color: inherit; background: transparent; resize: none; outline: none; }
+.v01 input { font: inherit; color: inherit; background: transparent; outline: none; }
+.v01 .w:hover .pinmark, .v01 .w:focus-within .pinmark, .v01 .w.stacked .pinmark { display: none; }
