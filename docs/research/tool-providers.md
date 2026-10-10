@@ -37,6 +37,23 @@ Framing facts that apply throughout:
 - **Wikimedia Enterprise** free account: 50,000 On-demand requests/month and needs signup (https://enterprise.wikimedia.com/pricing/). It is unnecessary for hux.
 - **Verdict:** a legitimate keyless source for encyclopedic lookups, though not general web search. The 200/min limit is per identified client, and whether it is keyed per IP or per UA is not stated. Each Gateway should include its own instance identifier in the UA.
 
+### Search built into Model endpoints
+
+If a Member's Model endpoint already searches the web on its side, hux can use that with no extra account. Checked on 2026-10-10:
+
+| Endpoint | How | Price | Terms that matter for hux | Status |
+|---|---|---|---|---|
+| **Anthropic** (Claude API) | Server tool `web_search_20250305` (basic), `_20260209` (dynamic filtering), `_20260318`; `max_uses`, `allowed_domains`/`blocked_domains`, `user_location`. On by default unless an org admin disables it in the Console; the Models API reports `capabilities.server_tools.web_search.supported`. Not on Amazon Bedrock; basic version only on Google Cloud | $10 / 1k searches plus result tokens | "When displaying API outputs directly to end users, citations must be included to the original source"; results carry `encrypted_content` that must be passed back unchanged in multi-turn use; ZDR eligibility per the server-tools page (https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool) | Verified |
+| **OpenAI** | Responses API tool `web_search` (`web_search_preview` legacy), domain `filters` (≤100), or the `gpt-5-search-api` model in Chat Completions (https://developers.openai.com/api/docs/guides/tools-web-search) | $10 / 1k calls plus search content tokens at model rates (https://developers.openai.com/api/docs/pricing) | Inline citations "must be clearly visible and clickable"; retention details only in the ZDR guide **[unverified]** | Verified |
+| **OpenRouter** | `plugins: [{"id": "web"}]` or a `:online` model suffix; works with any model. Engine is the model vendor's native search for supported OpenAI, Anthropic, Google, Perplexity models, otherwise Exa (also Parallel, Perplexity, Firecrawl) | Exa $0.007/request (≤10 results); native passes through the vendor price; "extra costs, even with free models" (https://openrouter.ai/docs/guides/features/plugins/web-search) | The query also reaches the engine (Exa or the vendor) | Verified |
+| **Google Gemini API** | Tool `google_search` on Gemini 2.0 Flash and later (https://ai.google.dev/gemini-api/docs/google-search) | Gemini 3+: 5,000 free search requests/month per project, then $14 / 1k; older models billed per prompt | Strict: only in an app you operate, shown with its Search Suggestions to the end user who asked, unmodified and not mixed with other content; no caching, indexing or reuse beyond limited storage; Google keeps prompts and output 30 days for grounding (https://ai.google.dev/gemini-api/terms) | Verified |
+| Local endpoints (Ollama, LM Studio, llama.cpp) | None built in | — | — | — |
+
+**Implications:**
+- The search runs at the endpoint's vendor (and for OpenRouter possibly at Exa), so the query text goes there. It counts as a search Service with that endpoint's Trust level.
+- Running it as a separate, minimal request (only the query, search enabled) keeps the rest of the prompt out and lets the Gateway check the query's Labels first.
+- Gemini's terms (show Search Suggestions to the asker, no mixing or caching) fit a direct answer to a Member, not a Role's background research. Anthropic and OpenAI require visible source citations.
+
 ### Keyed options (Member brings a key)
 
 | Provider | Free allowance | Paid | Notes (source) |
@@ -112,7 +129,7 @@ Framing facts that apply throughout:
 
 | Tool | Keyless default | Fallback order | Member-configurable |
 |---|---|---|---|
-| **web_search** | **None for general web search.** No keyless option is both ToS-clean and scales to thousands of installs. Ship `web_search` as "needs a provider". Out of the box, offer only `encyclopedia_lookup` (Wikipedia/Wikimedia API with a compliant UA) plus the DuckDuckGo Instant Answer API for quick facts | Configured provider → Wikipedia (facts only) | **Brave** (best general index; card required, $5/mo credits), **Tavily** (1k/mo, no card; agent-friendly), **Exa** ($10/mo, no card), **Kagi**, **Mojeek** (privacy, EU-friendly), **Marginalia** (free key, non-commercial, CC BY-NC-SA), **own SearXNG URL** (Member's choice and Member's responsibility for upstream ToS) |
+| **web_search** | **The Member's Model endpoint's own search** where it has one (Anthropic, OpenAI, OpenRouter, Gemini; see above), as a Service at that endpoint's Trust level. Otherwise no keyless general web search is both ToS-clean and scalable; Wikipedia/Wikimedia (compliant UA) plus DuckDuckGo Instant Answers always work for facts | Endpoint search → Member-added key → Wikipedia and DDG Instant Answers (facts only) | Offered in this order: **Tavily** (1k/mo, no card), **Exa** ($10/mo credits, no card), then **Brave** as a paid option (card required, $5/mo credits). Also **Kagi**, **Mojeek**, **Marginalia** (free key, non-commercial, CC BY-NC-SA), **own SearXNG URL** (Member's responsibility for upstream ToS) |
 | **web_fetch** | **Gateway's own HTTP fetch** plus local readability→Markdown | Own fetch → (opt-in) Jina Reader for JS-heavy pages | Jina key, self-hosted Jina Reader, Firecrawl (key or self-hosted) |
 | **weather** | **Open-Meteo** (per-IP limits; a household is far below 10k/day). Valid only while hux installs are non-commercial; attribute "Weather data by Open-Meteo.com" (CC BY 4.0) | Open-Meteo → MET Norway (with a project-level UA and contact; cache per `Expires`; truncate coordinates to 4 decimals) | Self-hosted Open-Meteo; Bright Sky (DE) and NWS (US) for official alerts; commercial Open-Meteo key |
 | **geocoding** | **Open-Meteo Geocoding** for place and postcode → coordinates (enough for weather). Public Nominatim/Photon only for **interactive, Member-triggered** lookups, through a Gateway cache, with OSM attribution. All installs share one Nominatim budget of 1 req/s, so it must be switchable remotely | Open-Meteo Geocoding → Photon (komoot) → Nominatim | Geoapify (free, production allowed), LocationIQ (free with link), OpenCage (paid), self-hosted Photon/Nominatim (country extract) |
