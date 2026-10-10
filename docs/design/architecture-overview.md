@@ -34,8 +34,8 @@ What makes this work:
 ## 1b. Desktop experience
 
 - The desktop app is a **tray-resident node**, not a big window. A global shortcut opens a quick-input bar (Spotlight-style); push-to-talk or a wake word starts voice.
-- **Each monitor is its own Surface.** Answers appear as widgets on it: a weather card, a recipe on the second monitor, a draft email to edit. hux places them where the Member asks (§6), and the Member can also move, resize, keep or close them by hand.
-- Voice and visuals work together: you speak, the agent answers by voice **and** shows things ("What's the weather?" gives a spoken summary plus a card).
+- **Each monitor is its own Surface.** Answers appear as widgets on it: a timer, a recipe on the second monitor, a draft email to edit. hux places them where the Member asks (§6), and the Member can also move, resize, keep or close them by hand.
+- Voice and visuals work together: you speak, the agent answers by voice **and** shows things ("How long does the lasagne need?" gives a spoken answer plus a timer).
 - Built with Tauri 2 (tray, global shortcuts, multi-window) and the same web renderer as the gateway's web interface.
 - **First launch is discovery-first.** The desktop app (like any node) looks for gateways on the LAN via mDNS/DNS-SD (`_hux._udp`, advertising the gateway name, key fingerprint and protocol version):
   - **Found one** → "Join *Smith Household*?" leads to a pairing request. The user approves it in the gateway's web interface or on an already-paired device. Both sides show the same short code (derived from both keys) to rule out a spoofed gateway. mDNS is unauthenticated; trust comes from the keys, never from discovery.
@@ -224,7 +224,7 @@ There is no app with pages (ADR 0010). Every screen is a Surface that starts as 
 - **Action tiers** (the dots model): autonomous → ask each time → pre-approvable narrowly (for example "this recurring email to Todd") → user-only (moving money, passwords). Presets per integration; custom rules can tighten but never loosen built-ins.
 - **Approvals** show the final payload and are hash-bound. They are collected on a paired device and fail closed on timeout. Scheduled sends get approved *at scheduling time*, with the exact payload.
 - **Secrets**: plugins and models see handles only. The egress proxy injects credentials and enforces per-plugin host allowlists.
-- **Outside Services are checked like models** (§9): a search, places or weather Service has its own allowlisted hosts, its own key handle and a Member-set Trust level; query text is checked against it by Label before it leaves, and what comes back is labelled as web content.
+- **Outside Services are checked like models** (§9): a Service behind a tool (a search engine, say) has its own allowlisted hosts, its own key handle and a Member-set Trust level; query text is checked against it by Label before it leaves, and what comes back is labelled as web content.
 - **Audit**: an append-only log of tool calls, approvals and egress, visible in the UI ("Recent activity").
 - Device pairing: a QR code carrying the gateway key plus a one-time token, a per-device key, permissions per node (for example the wall tablet cannot approve payments), and re-pairing on metadata change.
 
@@ -234,7 +234,7 @@ There is no app with pages (ADR 0010). Every screen is a Surface that starts as 
 |---|---|---|
 | Tools (email, lottery, bank, recipes) | Wasm components (WASI 0.3, `hux:*` WIT interfaces) on the gateway | Sandboxed, capability-granted |
 | Third-party tool servers | MCP client (`rmcp`), descriptions pinned by hash, outputs untrusted | External, untrusted |
-| Services behind built-in tools (search, weather, places) | Built-in adapters, Wasm components on the tool's WIT interface, or mapped MCP tools (ADR 0013) | Per-Service Trust level, egress allowlist and secret handle |
+| Services behind a tool (search, page reading, or a tool an extension defines) | Built-in adapters, Wasm components on the tool's WIT interface, or mapped MCP tools (ADR 0013) | Per-Service Trust level, egress allowlist and secret handle |
 | Skills (know-how only) | `SKILL.md` (agentskills.io format, including Claude Code and Codex extensions) | No authority of their own; bundled scripts only as Wasm |
 | Roles and teams | `SOUL.md` plus role manifest; team bundles; imported Claude Code, Codex and Copilot agent files | Can only narrow the parent's grants |
 | Channels and renderers | Connector nodes over the node protocol | Process-isolated |
@@ -258,27 +258,23 @@ Manifest `hux-plugin.toml`: declared capabilities, deny by default, user consent
 - **Granted per Role.** A server's tools reach only the Roles the Member picks, each tool with its own Action tier (read-only tools default to autonomous, everything else to ask each time), and a Delegation passes on no more than the parent holds.
 - **hux as an MCP server** (later, phase 4+). The Gateway can expose a few chosen capabilities ("add to the shopping list", "ask hux", "what's on my calendar today") to other agents such as a coding assistant on the desktop. Each outside agent is paired like a Node, acts as one Member, gets only the tools that Member ticks, and every call goes through the same policy, Labels, Approvals and audit as a Role's. Nothing is exposed until a Member turns it on.
 
-**Built-in tools and their Services** (ADR 0013, `docs/research/tool-providers.md`). Generic abilities (`web_search`, `web_fetch`, `weather`, `places`, `news`) are hux tools with one stable, typed interface; Roles are granted the tool, never a particular Service behind it.
-- **A Service is an extension point.** It is built in (compiled Rust adapter), a Wasm Plugin implementing the tool's WIT interface (`hux:search`, `hux:weather`…), or an MCP server's tool mapped onto the interface by the Member. Each declares the hosts it calls, the secret handle it needs, its terms (attribution, rate limit, cache rules) and what the Service gets to see.
-- **Works out of the box.** hux ships defaults that need no account or key and whose terms allow an app to use them (below). A Member adds or switches Services by asking ("use my Brave key for search"); the key goes into the vault, the host into the egress allowlist for that Service only.
-- **Fallback order.** Each tool has an ordered list of Services. The Gateway tries the next when one fails, is rate-limited or is not trusted for the query, and the answer names the Service that produced it. Results are cached per Service as its terms allow.
+**Tools with swappable Services** (ADR 0013, `docs/research/tool-providers.md`). A tool has one stable, typed interface; Roles are granted the tool, never a particular Service behind it. hux itself ships only two such tools, because only they are truly general: `web_search` and `web_fetch`. Everything else (weather, maps, news) is an ordinary extension a Member adds, and any extension may use the same pattern.
+- **A Service is an extension point.** It is built in (compiled Rust adapter), a Wasm Plugin implementing the tool's WIT interface (`hux:search`, or one an extension defines), or an MCP server's tool mapped onto the interface by the Member. Each declares the hosts it calls, the secret handle it needs, its terms (attribution, rate limit, cache rules) and what the Service gets to see.
+- **Switched by asking.** "Use my Tavily key for search": the key goes into the vault, the host into the egress allowlist for that Service only. Expert mode shows the list, hosts and terms.
+- **Fallback order.** Each tool has an ordered list of Services. The Gateway tries the next when one fails, is rate-limited or is not trusted for the query, and the answer names the Service that produced it and carries its attribution. Results are cached per Service as its terms allow.
 - **A Model endpoint's own search is a Service too.** If an endpoint searches on its side, `web_search` uses it with no setup, as a separate request that carries only the query. The endpoint's vendor sees that query, so it is checked against the endpoint's Trust level, and the vendor's citation rules travel with the result.
-- **Trust level per Service.** A search or geocoding Service sees the query text, so it gets a Member-set Trust level exactly like a Model endpoint (§7, §8), defaulting to *Public*. A query carrying data above that level goes to a more trusted Service, is rewritten without the personal part, or is asked about; it is never sent silently.
+- **Trust level per Service.** A Service sees the query text, so it gets a Member-set Trust level exactly like a Model endpoint (§7, §8), defaulting to *Public*. A query carrying data above that level goes to a more trusted Service, is rewritten without the personal part, or is asked about; it is never sent silently.
 
-**Defaults shipped** (fallback order left to right; terms and caveats in `docs/research/tool-providers.md` §6):
+**What ships** (terms and caveats in `docs/research/tool-providers.md`):
 
 | Tool | Out of the box, no key | Members can add |
 |---|---|---|
 | `web_search` | The search built into the Member's Model endpoint, where it has one (Anthropic, OpenAI, OpenRouter, Gemini). Wikipedia and DuckDuckGo instant answers always work for facts. Without either, the first open-web question gets one offer: "To search the web I need a search service. Tavily is free for 1,000 searches a month and needs no card. Set it up?" | Tavily, Exa (both free tiers, no card), Brave (paid), Kagi, Mojeek, Marginalia (free key), the Member's own SearXNG |
 | `web_fetch` | The Gateway fetches the page itself and turns it into text (identifying User-Agent, robots.txt for unattended fetches, no private addresses) | Jina Reader, Firecrawl (hosted or self-hosted) |
-| `weather` | Open-Meteo, then MET Norway | Self-hosted Open-Meteo, Bright Sky (DWD warnings), NWS (US) |
-| `places` | Open-Meteo geocoding for towns and postcodes, then Photon and Nominatim for lookups a Member asks for, cached at the Gateway; OSM map tiles for maps on screen | Geoapify, LocationIQ, OpenCage, self-hosted Photon or Nominatim, another tile server |
-| `news` | RSS feeds from a short starter list the Member can edit, then GDELT | Brave or Tavily news |
 
 - hux does not bundle SearXNG or scrape DuckDuckGo or Google: those engines' terms forbid automated use. A Member's own SearXNG is offered in expert mode, with that said plainly.
-- Every keyless default identifies hux honestly (project contact plus an install id), caches, never polls, and rounds coordinates. Nominatim and MET Norway count all hux installs as one app, so the default list ships as data the project can update without a release.
-- Results carry an attribution the Surface or voice shows ("Weather data by Open-Meteo.com", "© OpenStreetMap contributors", Wikipedia's CC BY-SA).
-- Open-Meteo's free tier and Marginalia's free keys are non-commercial; if hux is ever sold or hosted, these defaults change.
+- Keyless Services identify hux honestly (project contact plus an install id) and cache; the default list ships as data the project can update without a release.
+- Weather, maps and news come as extensions from the registry; the research note lists good candidates for the first ones.
 
 ## 10. Memory
 

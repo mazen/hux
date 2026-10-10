@@ -209,7 +209,7 @@ An installable package that gives hux new tools, sandboxed and limited to the pe
 _Avoid_: extension, add-on, app
 
 **Service**:
-An outside service that does the work behind one of hux's built-in tools, such as a search engine behind web search or a weather service behind the forecast, which a Member can switch or add.
+An outside service that does the work behind a tool, such as a search engine behind web search, which a Member can switch or add.
 _Avoid_: provider (that word belongs to Model endpoints), backend, engine, source
 
 **Skill**:

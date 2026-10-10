@@ -1,4 +1,4 @@
-# Providers for hux's built-in generic tools
+# Services for hux's web tools and first extensions
 
 Research date: 2026-10-09. Scope: which external services could back `web_search`, page fetch/read, weather, geocoding/maps and news, (a) as a **zero-configuration default** (no account, no key, thousands of independent self-hosted Gateways each making their own requests) and (b) as **Member-configurable** options (Member brings a key). Primary sources are linked inline. **[unverified]** marks claims I could not confirm in a primary source; **[opinion]** marks quality judgements.
 
@@ -86,7 +86,7 @@ If a Member's Model endpoint already searches the web on its side, hux can use t
 - A fetch the Member triggers for one URL is not crawling in the RFC 9309 sense. Even so, the Gateway should: send an honest, identifying User-Agent; honour robots.txt for agent-initiated, non-interactive fetches (caching it for ≤24 h, per RFC 9309 §2.4); not bypass paywalls or anti-bot challenges; cap size and redirects; and apply SSRF protection (no private, link-local or metadata IPs).
 - The keyless Jina tier is per-IP **[unverified]** and sends every URL to a third party. Use it only as an opt-in fallback for JavaScript-heavy pages.
 
-## 3. Weather
+## 3. Weather (candidate extension)
 
 | Provider | Key | Limits | Licence / attribution | Terms for many installs | Self-host |
 |---|---|---|---|---|---|
@@ -100,7 +100,7 @@ If a Member's Model endpoint already searches the web on its side, hux can use t
 - MET Norway is global, and strongest in the Nordics.
 - Bright Sky and NWS are authoritative for official warnings in their own countries.
 
-## 4. Geocoding and maps
+## 4. Geocoding and maps (candidate extension)
 
 | Provider | Key | Free limits | Terms relevant to hux | Licence |
 |---|---|---|---|---|
@@ -118,14 +118,16 @@ If a Member's Model endpoint already searches the web on its side, hux can use t
 - No prefetch and **no offline use**. Availability is best-effort, with "no SLA or guarantee". The tile URL should be configurable (https://operations.osmfoundation.org/policies/tiles/).
 - It is usable for on-screen maps that a Member is actively viewing, through a Gateway cache, but not as a guaranteed default.
 
-## 5. News
+## 5. News (candidate extension)
 
 - **RSS/Atom feeds:** no key and the most robust option. Each publisher's terms govern reuse **[per-publisher]**. Members add feeds, and hux can ship a curated starter list.
 - **GDELT:** free for "any academic, commercial, or governmental use"; redistribution must cite GDELT with a link (https://www.gdeltproject.org/about.html). The DOC 2.0 API (`api.gdeltproject.org`) is keyless **[API terms and limits unverified]**. Quality **[opinion]**: broad, but metadata-level and noisy.
 - **NewsAPI.org:** the free Developer plan is 100 requests/day with a 24 h delay, "development and testing in a development environment only", so production use requires an upgrade (https://newsapi.org/pricing). **It cannot be a default.**
 - Brave and Tavily also have news modes via their keyed APIs.
 
-## 6. Candidates for out-of-the-box defaults
+## 6. Defaults for the built-in tools and candidates for first extensions
+
+Owner decision (2026-10-10): hux ships only `web_search` and `web_fetch` as built-in tools. Weather, geocoding/maps and news are not part of core; their rows below are candidates for the first registry extensions, not shipped defaults (ADR 0013).
 
 | Tool | Keyless default | Fallback order | Member-configurable |
 |---|---|---|---|
@@ -139,7 +141,7 @@ If a Member's Model endpoint already searches the web on its side, hux can use t
 **Caveats:**
 1. **Identify honestly.** MET Norway, Wikimedia, NWS and OSM all require an identifying User-Agent with contact details. hux needs a project contact (URL or email) in the default UA, plus a per-install suffix, so operators can tell installs apart without the project being blocked as a whole.
 2. **Per-application budgets (Nominatim 1 req/s, MET 20 req/s) are shared by all hux installs.** Cache aggressively at each Gateway, never poll, and make every endpoint switchable through config (and ideally through a remotely updatable provider list), since OSMF may require switching "at any time".
-3. **Commercial status matters.** Open-Meteo's free tier, Marginalia's free keys and NewsAPI's dev plan are non-commercial or dev-only. If hux is ever sold, hosted or ad-supported, these defaults must change.
+3. **Commercial status matters.** Open-Meteo's free tier, Marginalia's free keys and NewsAPI's dev plan are non-commercial or dev-only. If hux or an extension is ever sold, hosted or ad-supported, these choices must change.
 4. **Attribution must surface in answers:** CC BY 4.0 for Open-Meteo, MET and DWD; ODbL ("© OpenStreetMap contributors") for OSM-based results; CC BY-SA for Wikipedia text; CC BY-NC-SA for Marginalia's free tier. Tool results should carry an `attribution` field that the UI or voice layer can render.
 5. **Privacy:** every keyless service sees the household's IP. Open-Meteo logs coordinates for 90 days. Round coordinates (to ~3–4 decimals) and strip personal data from queries at the Gateway.
 6. **Don't ship scrapers as defaults:** no DuckDuckGo HTML, no bundled SearXNG hitting Google, no Serper/SerpAPI.
